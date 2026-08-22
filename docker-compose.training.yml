@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  training-base:
+    build:
+      context: .
+      dockerfile: Dockerfile.training
+    image: lightning-training:latest
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - PYTHONPATH=/workspace
+      - TOKENIZERS_PARALLELISM=false
+      - CUDA_VISIBLE_DEVICES=0
+    volumes:
+      - .:/workspace
+      - ~/.cache/huggingface:/root/.cache/huggingface
+      - ~/.cache/nvidia:/root/.cache/nvidia
+      - /home/areite/Dev/spark-inference/models:/workspace/pretrained_models:ro
+    shm_size: 16g
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  trainer:
+    extends: training-base
+    command: ["sleep", "infinity"]
+    profiles: ["default"]
+
+  smoketest:
+    extends: training-base
+    command: ["python3", "scripts/preflight_qlora.py"]
+    profiles: ["smoketest"]
+
+  grpo-trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile.grpo
+    image: lightning-training-grpo:latest
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - PYTHONPATH=/workspace
+      - TOKENIZERS_PARALLELISM=false
+      - CUDA_VISIBLE_DEVICES=0
+    volumes:
+      - .:/workspace
+      - ~/.cache/huggingface:/root/.cache/huggingface
+      - ~/.cache/nvidia:/root/.cache/nvidia
+      - /home/areite/Dev/spark-inference/models:/workspace/pretrained_models:ro
+    shm_size: 16g
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    profiles: ["grpo"]

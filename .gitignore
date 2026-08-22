@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+*.egg
+
+# OS / editor
+.DS_Store
+*.swp
+*~
+
+# Logs and intermediate files
+*.log
+*.partial
+
+# Model artifacts (multi-GB, can be regenerated)
+# Lightning .ckpt files (LoRA + optimizer state, ~2.5GB each)
+*.ckpt
+
+# PEFT adapter weights (~200MB-800MB each — too big for GitHub)
+adapter_model.safetensors
+adapter_model.bin
+optimizer.pt
+scheduler.pt
+rng_state.pth
+training_args.bin
+trainer_state.json
+
+# Don't push the giant overfit/debug checkpoint dirs
+outputs/debug/
+outputs/overfit_*/checkpoints/
+outputs/sft/checkpoints/
+outputs/dpo/checkpoints/
+outputs/qlora/checkpoints/
+outputs/grpo/checkpoints/
+outputs/sweeps/
+
+# HuggingFace cache (separate from repo)
+.cache/
+
+# We keep these (small but useful):
+#   data/*.jsonl (training/test data — ~2.5MB)
+#   outputs/comparison/ (the writeup + plots)
+#   outputs/logs/ (TensorBoard event files — ~250KB)

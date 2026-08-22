@@ -1,0 +1,21 @@
+# Separate from NeMo 25.02: that image's Torch is too old for the TRL release
+# that introduced GRPOConfig. NVIDIA publishes this PyTorch image for ARM64/
+# Grace Blackwell; versions below match the TRL 0.15 generation of APIs used by
+# train_grpo.py.
+FROM nvcr.io/nvidia/pytorch:26.05-py3
+
+RUN pip install --no-cache-dir \
+      'transformers==4.49.0' \
+      'trl==0.15.1' \
+      'peft==0.14.0' \
+      'datasets==3.2.0' \
+      'accelerate==1.3.0' \
+      'rouge_score==0.1.2' \
+      'safetensors>=0.4.5'
+
+# This NGC release ships an Apex package without the legacy apex.amp symbol.
+# Transformers detects the package and assumes that symbol exists; removing
+# the optional package makes Trainer use native PyTorch AMP as intended.
+RUN pip uninstall -y apex
+
+WORKDIR /workspace

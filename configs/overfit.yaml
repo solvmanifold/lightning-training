@@ -1,0 +1,42 @@
+model:
+  name: nvidia/NVIDIA-Nemotron-3.5-Lightning-BF16
+  trust_remote_code: true
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.0
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  max_seq_len: 256
+  micro_batch_size: 4
+  grad_accumulation_steps: 1
+  max_steps: 50
+  warmup_steps: 5
+  val_every_n_steps: 10
+  val_batches: 1
+  lr: 1.0e-3         # high LR to force fast overfit
+  weight_decay: 0.0
+  grad_clip: 1.0
+  precision: bf16-mixed
+  overfit_batches: 1  # Lightning: use the same single batch for train + val
+
+data:
+  train_path: data/smoke.jsonl
+  val_path: data/smoke.jsonl
+  use_chat_template: true
+
+output:
+  run_name: overfit-r8-all-lr1e3
+  checkpoint_dir: outputs/overfit_a/checkpoints
+  log_dir: outputs/logs
+  save_top_k: 1
+  save_last: false
