@@ -32,6 +32,35 @@ behavior. This project adds task-quality evaluation and decision criteria.
 
 ## Evaluation suites
 
+### HellaSwag harness smoke
+
+Run HellaSwag first to validate the evaluation path against a familiar,
+automatically scored task. This is a harness and reproducibility check, not the
+evidence used to decide whether the model needs fine-tuning.
+
+Protocol:
+
+1. Pin the HellaSwag dataset revision, validation split, prompt text, and prompt
+   hash.
+2. Run the first 100 validation examples as a fixed smoke subset.
+3. Use the deployed NVFP4 chat endpoint with thinking off, temperature zero,
+   and a short output limit. Ask for exactly one label: `A`, `B`, `C`, or `D`.
+4. Preserve every raw response and score a label only after strict, documented
+   normalization. Count invalid or ambiguous responses separately.
+5. Repeat the smoke subset and require identical normalized predictions before
+   expanding to all 10,042 validation examples.
+
+Report this result as `hellaswag-chat-mc`. It is not directly comparable to the
+standard HellaSwag benchmark, which ranks candidate continuations by model
+likelihood. Probe the serving endpoint for the log-probability or forced-
+completion capabilities needed by a standard-compatible scorer; if supported,
+implement and report that protocol separately.
+
+HellaSwag may also have been present in, or exposed by material related to, the
+model's broad pre-training corpus. Its score can expose harness bugs and provide
+a repeatable model fingerprint, but cannot establish clean generalization or by
+itself justify fine-tuning.
+
 ### Real-workload decision set
 
 The primary suite will contain representative tasks from the intended product
@@ -182,6 +211,12 @@ examples and operational cost, not just a headline score.
 - Start the existing Lightning service through `spark-inference`.
 - Capture health, model metadata, NIM profile, and Git revisions.
 - Confirm reasoning on/off behavior.
+- Run the fixed 100-example HellaSwag chat-MC smoke twice and verify identical
+  normalized predictions.
+- If stable, run the full HellaSwag validation split and publish the result with
+  its explicitly non-standard protocol label.
+- Probe whether the endpoint exposes enough continuation likelihood information
+  for a separate standard-compatible HellaSwag scorer.
 - Probe schema-constrained output and tool-call request compatibility.
 - Reuse the existing streaming benchmark for latency and throughput.
 

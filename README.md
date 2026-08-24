@@ -40,9 +40,12 @@ model start nemotron-3.5-lightning
 curl -s http://localhost:8011/v1/health/ready
 ```
 
-Evaluation will compare a versioned prompt ladder, deterministic structured
-outputs, mock tool calls, and grounded QA. The locked test set must never be
-used to create prompts, retrieval content, or training examples.
+Evaluation starts with a reproducible HellaSwag chat-MC harness smoke, then
+moves to the decision-relevant workload suite: a versioned prompt ladder,
+deterministic structured outputs, mock tool calls, and grounded QA. The
+HellaSwag chat score is not presented as the standard likelihood-ranked
+benchmark or used alone to justify fine-tuning. The locked workload test set
+must never be used to create prompts, retrieval content, or training examples.
 
 ## Fine-tuning baseline
 
