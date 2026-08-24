@@ -1,0 +1,31 @@
+services:
+  trainer:
+    image: nvcr.io/nvidia/nemo-automodel:26.06.00
+    ipc: host
+    shm_size: 16g
+    working_dir: /opt/Automodel
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      HF_HOME: /root/.cache/huggingface
+      OMP_NUM_THREADS: "8"
+      MKL_NUM_THREADS: "8"
+      TOKENIZERS_PARALLELISM: "false"
+    volumes:
+      - .:/workspace
+      - ${HOME}/.cache/huggingface:/root/.cache/huggingface
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command:
+      - automodel
+      - /workspace/configs/lightning_lora_gb10.yaml
+      - --nproc-per-node
+      - "1"
+

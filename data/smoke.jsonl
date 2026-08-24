@@ -1,4 +1,0 @@
-{"messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "What is 2 + 2?"}, {"role": "assistant", "content": "4"}]}
-{"messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "What is the capital of France?"}, {"role": "assistant", "content": "Paris"}]}
-{"messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "What color is the sky on a clear day?"}, {"role": "assistant", "content": "Blue"}]}
-{"messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "How many days are in a week?"}, {"role": "assistant", "content": "Seven"}]}
