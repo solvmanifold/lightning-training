@@ -9,7 +9,8 @@ training framework.
 
 ## Provenance
 
-The baseline configuration is adapted from NVIDIA NeMo AutoModel's
+The baseline configuration is adapted from
+[NVIDIA NeMo AutoModel](https://github.com/NVIDIA-NeMo/Automodel)'s
 [`nemotron_nano_v3_5_lightning_singlegpu_lora.yaml`](https://github.com/NVIDIA-NeMo/Automodel/blob/060cc495ac23350d4882f67ddf96ba663dd3696c/examples/llm_finetune/nemotron/nemotron_nano_v3_5_lightning_singlegpu_lora.yaml)
 at upstream commit `060cc495ac23350d4882f67ddf96ba663dd3696c`.
 
