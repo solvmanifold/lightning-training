@@ -49,6 +49,17 @@ HellaSwag chat score is not presented as the standard likelihood-ranked
 benchmark or used alone to justify fine-tuning. The locked workload test set
 must never be used to create prompts, retrieval content, or training examples.
 
+Prepare the pinned HellaSwag data and deterministic, LLM-free Atlas synthetic
+smoke set without using the GPU:
+
+```bash
+python3 scripts/prepare_hellaswag.py
+python3 scripts/generate_atlas_smoke.py
+python3 scripts/verify_data.py
+```
+
+See the [data artifact notes](data/README.md) for provenance and layout.
+
 ## Fine-tuning baseline
 
 The checked-in training configuration is retained as a conditional path, not

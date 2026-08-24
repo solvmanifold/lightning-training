@@ -1,0 +1,35 @@
+{
+  "artifacts": {
+    "development": {
+      "path": "data/synthetic/atlas_smoke/development.jsonl",
+      "rows": 40,
+      "sha256": "17e007f3bbc01bdb8a76e0d2222bf8bfe02d572bdb943bc5410608200c06e0a4"
+    },
+    "regression": {
+      "path": "data/synthetic/atlas_smoke/regression.jsonl",
+      "rows": 24,
+      "sha256": "96f0b097bd634fcf1c335bc6f48d49001635813471275fd8e4399e7e0119bd19"
+    },
+    "test": {
+      "path": "data/synthetic/atlas_smoke/test.jsonl",
+      "rows": 40,
+      "sha256": "0775c4286c53c84548b785f074db54112215369c26e99ea9b7cd5a2f8b82e3cf"
+    },
+    "train": {
+      "path": "data/synthetic/atlas_smoke/train.jsonl",
+      "rows": 120,
+      "sha256": "fa858d9d17267cc2130201e9ea1b7316d2b3bfd780f9bda784295e716546f316"
+    }
+  },
+  "generator": {
+    "path": "scripts/generate_atlas_smoke.py",
+    "sha256": "eaa1ec9d8de94e411677a687645700279678822dcc97a79d28a1594d2367795d"
+  },
+  "seed": 35003500,
+  "tool_catalog": {
+    "path": "data/synthetic/atlas_smoke/tool_catalog.json",
+    "sha256": "6b5fd2b88bfe3c821d9d35db6e08ceef00f4be0bdecda8d221750be28a4e5865",
+    "tools": 6
+  },
+  "version": "atlas-smoke-v1"
+}

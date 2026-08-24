@@ -1,0 +1,19 @@
+{
+  "artifact": {
+    "path": "data/hellaswag/chat_mc_smoke_100.jsonl",
+    "rows": 100,
+    "sha256": "c86efd3f3907d226d7d9c16a47521110a1ad42d81e9514f4e9fad32fc5be4cc6"
+  },
+  "generator": {
+    "path": "scripts/prepare_hellaswag.py",
+    "sha256": "774a376d93303d58cb0ded10cb68692f6cc7189c1e16a7297870be35bb6772e5"
+  },
+  "prompt_sha256": "e259243e6022fdd1dcaf6ff9a6b79d5c68857ff2fbc55e0cbc06521395efe6a5",
+  "protocol": "hellaswag-chat-mc",
+  "source": {
+    "revision": "a29ff8e9a04bba4bd6588223785ce105328adc57",
+    "rows": 10042,
+    "sha256": "0aa3b88843990f3f10a97b9575c94d7b71fb2205240ba04ae4884d9e9c992588",
+    "url": "https://raw.githubusercontent.com/rowanz/hellaswag/a29ff8e9a04bba4bd6588223785ce105328adc57/data/hellaswag_val.jsonl"
+  }
+}

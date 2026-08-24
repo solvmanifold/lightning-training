@@ -1,0 +1,171 @@
+{
+  "id": "atlas-smoke-v1",
+  "tools": [
+    {
+      "function": {
+        "description": "Temporarily prevent an account from signing in.",
+        "name": "suspend_account",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "account_id": {
+              "type": "string"
+            },
+            "reason_code": {
+              "enum": [
+                "security_incident",
+                "policy_violation"
+              ]
+            }
+          },
+          "required": [
+            "account_id",
+            "reason_code"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "Permanently schedule an account for deletion.",
+        "name": "delete_account",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "account_id": {
+              "type": "string"
+            },
+            "reason_code": {
+              "enum": [
+                "user_request",
+                "policy_violation"
+              ]
+            }
+          },
+          "required": [
+            "account_id",
+            "reason_code"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "Replace a credential and return a new active credential.",
+        "name": "rotate_credential",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "credential_id": {
+              "type": "string"
+            },
+            "project_id": {
+              "type": "string"
+            },
+            "reason_code": {
+              "enum": [
+                "scheduled_rotation",
+                "suspected_exposure"
+              ]
+            }
+          },
+          "required": [
+            "project_id",
+            "credential_id",
+            "reason_code"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "Disable a credential without creating a replacement.",
+        "name": "revoke_credential",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "credential_id": {
+              "type": "string"
+            },
+            "project_id": {
+              "type": "string"
+            },
+            "reason_code": {
+              "enum": [
+                "suspected_exposure",
+                "no_longer_needed"
+              ]
+            }
+          },
+          "required": [
+            "project_id",
+            "credential_id",
+            "reason_code"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "Change a project member's role without changing ownership.",
+        "name": "change_project_role",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "project_id": {
+              "type": "string"
+            },
+            "role": {
+              "enum": [
+                "viewer",
+                "editor",
+                "admin"
+              ]
+            },
+            "user_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "project_id",
+            "user_id",
+            "role"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    },
+    {
+      "function": {
+        "description": "Make a project member the project's owner.",
+        "name": "transfer_project_ownership",
+        "parameters": {
+          "additionalProperties": false,
+          "properties": {
+            "new_owner_id": {
+              "type": "string"
+            },
+            "project_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "project_id",
+            "new_owner_id"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "function"
+    }
+  ]
+}
