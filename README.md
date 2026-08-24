@@ -9,6 +9,8 @@ Local inference already lives in `~/Dev/spark-inference`. Its verified NVIDIA
 NIM serves the deployable NVFP4 checkpoint at
 `http://localhost:8011/v1/chat/completions` as
 `nvidia/nemotron-3.5-lightning`. See the [evaluation plan](docs/EVALUATION_PLAN.md).
+The first experiment designed to give LoRA a fair opportunity is the
+[behavioral-compression tool-routing study](docs/BEHAVIORAL_COMPRESSION_EXPERIMENT.md).
 
 ## Provenance
 

@@ -251,3 +251,8 @@ Only after the gate passes:
 - Train against the identified failure class.
 - Evaluate the adapter on the untouched suite and regression set under a
   serving configuration comparable to the NVFP4 baseline.
+
+The first controlled candidate is the
+[behavioral-compression experiment](BEHAVIORAL_COMPRESSION_EXPERIMENT.md), which
+tests whether LoRA can replace a large tool-routing prompt while beating strong
+prompting, retrieved examples, constrained output, and validation baselines.
