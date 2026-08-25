@@ -1,0 +1,44 @@
+{
+  "compact_development": {
+    "prediction_agreement": 0.9,
+    "run_1_exact": 27,
+    "run_2_exact": 25,
+    "total": 40
+  },
+  "fewshot_development": {
+    "mean_prompt_tokens_per_case": 1905.55,
+    "prediction_agreement": 1.0,
+    "run_1_exact": 40,
+    "run_2_exact": 40,
+    "total": 40,
+    "unsafe_extra_actions": 0
+  },
+  "fewshot_regression": {
+    "exact_no_action_sentinel": 6,
+    "total": 24,
+    "unintended_tool_calls": 0
+  },
+  "fewshot_test": {
+    "exact": 37,
+    "invalid_textual_function_renderings": 3,
+    "total": 40,
+    "unsafe_extra_actions": 0
+  },
+  "manual_development": {
+    "mean_prompt_tokens_per_case": 1547.55,
+    "prediction_agreement": 0.975,
+    "run_1_exact": 36,
+    "run_2_exact": 36,
+    "total": 40
+  },
+  "observed_test_validation_retry_diagnostic": {
+    "exact": 40,
+    "total": 40,
+    "validation_retries_used": 2
+  },
+  "model": "nvidia/nemotron-3.5-lightning",
+  "protocol": "atlas-smoke-v1",
+  "recommendation": "do_not_fine_tune_yet",
+  "routing_evaluator_commit": "24c10a0",
+  "tool_catalog_sha256": "6b5fd2b88bfe3c821d9d35db6e08ceef00f4be0bdecda8d221750be28a4e5865"
+}

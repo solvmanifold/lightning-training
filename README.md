@@ -63,6 +63,8 @@ The [evaluation runbook](docs/EVALUATION_RUNBOOK.md) documents checkpointed
 execution, resumption, and the one-command GPU release procedure.
 The first completed result is the
 [2026-08-25 HellaSwag chat-MC report](reports/HELLASWAG_CHAT_MC_2026-08-25.md).
+The first decision-relevant workload result is the
+[2026-08-25 Atlas tool-routing smoke report](reports/ATLAS_SMOKE_2026-08-25.md).
 
 ## Fine-tuning baseline
 
