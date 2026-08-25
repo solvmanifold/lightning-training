@@ -112,3 +112,23 @@ restores the latest compatible checkpoint when the trainer is started again.
 Before any LoRA run, we must also prove that its adapter can be served through
 a practical Spark deployment path and evaluated under conditions comparable to
 the current NVFP4 baseline. DPO, GRPO, and QLoRA remain out of scope.
+
+That gate now passes: the 16-case Beacon adapter trained, saved, reloaded
+through NVIDIA NIM, and scored 16/16 exact. NIM 2.0.9-variant requires
+`--enforce-eager` for reliable LoRA restarts on this GB10; see the
+[Beacon report](reports/BEACON_JSON_2026-08-25.md) for the result and serving
+limitation.
+
+The two precommitted full candidates differ only by seed. Start the first as a
+named, pausable container:
+
+```bash
+docker compose run -d --name lightning-training-beacon-seed1111 trainer \
+  automodel /workspace/configs/beacon_lora_seed1111.yaml --nproc-per-node 1
+./scripts/pause_training.sh lightning-training-beacon-seed1111
+```
+
+AutoModel checkpoints every 64 optimizer steps and restores the latest
+compatible checkpoint when the same command is launched again. Train and
+checkpoint selection use only the training and development splits; the locked
+test is opened once after the candidate and configuration are frozen.

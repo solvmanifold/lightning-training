@@ -84,6 +84,28 @@ prompt changes, hyperparameters, or checkpoint selection. Any LoRA is trained
 only on the already-frozen 2,048-case training split and selected only on
 development. Its configuration must be committed before its single test run.
 
+## LoRA infrastructure and overfit gates
+
+The pinned NeMo AutoModel 26.06 container completed NVIDIA's unmodified
+20-step single-GPU recipe on HellaSwag. It loaded 61.31 GB of BF16 weights,
+trained 7,072,256 LoRA parameters (0.02% of 32,920,335,424 total parameters),
+and saved both adapter and resumable optimizer state. Steady-state training was
+about nine seconds per optimizer step for the Beacon sequence lengths and used
+about 62.5 GiB of unified GPU memory.
+
+A separate 16-example Beacon overfit run used only the first 16 training cases.
+Loss fell from 1.2832 to 0.1807 over 20 optimizer steps; validation on those
+same examples fell to 0.1459. Served through NVIDIA NIM's NVFP4 LoRA profile,
+the compact-prompt base condition scored 4/16 exact while the adapter scored
+16/16 exact with 100% JSON parse, schema validity, and field accuracy. A fresh
+NIM process reloaded the saved adapter and repeated 16/16 exactly.
+
+The restart test also exposed a GB10 serving limitation: NIM 2.0.9-variant's
+compiled LoRA path failed once during startup with `cudaErrorIllegalInstruction`
+inside `lora_shrink`. Adding vLLM's `--enforce-eager` flag made clean adapter
+reload reliable, at the cost of slower inference. This workaround and its
+performance cost remain part of the operational deployment gate.
+
 ## Decision gate
 
 Proceed with the NVIDIA-recipe infrastructure smoke and then a small LoRA
@@ -104,4 +126,3 @@ and regression limits remain mandatory.
 
 Aggregate metrics are in
 [`beacon-json-2026-08-25.json`](beacon-json-2026-08-25.json).
-
