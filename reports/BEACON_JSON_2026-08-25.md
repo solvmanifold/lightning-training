@@ -106,6 +106,16 @@ inside `lora_shrink`. Adding vLLM's `--enforce-eager` flag made clean adapter
 reload reliable, at the cost of slower inference. This workaround and its
 performance cost remain part of the operational deployment gate.
 
+The first full-data candidate, seed 1111 at the precommitted step-63 boundary,
+then scored **256/256 exact on development** with the compact prompt. JSON
+parse, schema validity, and field precision/recall were all 100%. Its
+teacher-forced development loss was 0.0003. Training was therefore stopped
+early instead of spending the remaining three-quarter epoch after development
+had saturated. The graceful pause completed step 72 and saved a separate
+resumable checkpoint, but checkpoint selection remains step 63. A second seed
+is required before the adapter configuration is frozen for the single locked
+test run.
+
 ## Decision gate
 
 Proceed with the NVIDIA-recipe infrastructure smoke and then a small LoRA

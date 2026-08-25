@@ -137,8 +137,8 @@ Serve a completed checkpoint with the verified eager-mode LoRA profile:
 
 ```bash
 ./scripts/serve_lora_nim.sh \
-  outputs/checkpoints/beacon-lora-seed1111/epoch_0_step_255/model \
-  beacon-seed1111-step255
+  outputs/checkpoints/beacon-lora-seed1111/epoch_0_step_63/model \
+  beacon-seed1111-step63
 ```
 
 The launcher uses the shared offline NIM cache, exposes port 8012 by default,
