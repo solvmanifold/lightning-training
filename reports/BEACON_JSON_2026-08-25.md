@@ -116,6 +116,15 @@ resumable checkpoint, but checkpoint selection remains step 63. A second seed
 is required before the adapter configuration is frozen for the single locked
 test run.
 
+Seed 2222 reproduced the step-63 development loss of 0.0003 but scored 253/256
+(98.83%) exact in generation. Two restore cases were emitted as retire actions,
+making the resulting objects schema-invalid, and one retire preview was emitted
+as apply. JSON parse rate was 100%, schema validity was 254/256 (99.22%), and
+field precision/recall were 99.88%. Seed 1111 step 63 is therefore frozen as
+the selected adapter. Its SHA-256 is
+`79d85f72ab9ea9fdb9426e6afefb51db704919cac5449661faaa16c3e3c07ec0`.
+No LoRA test case was used for schedule or seed selection.
+
 ## Decision gate
 
 Proceed with the NVIDIA-recipe infrastructure smoke and then a small LoRA
@@ -135,4 +144,5 @@ latency/throughput. Adapter serving, rollback, invalid-output rate below 1%,
 and regression limits remain mandatory.
 
 Aggregate metrics are in
-[`beacon-json-2026-08-25.json`](beacon-json-2026-08-25.json).
+[`beacon-json-2026-08-25.json`](beacon-json-2026-08-25.json) and
+[`beacon-lora-development-2026-08-25.json`](beacon-lora-development-2026-08-25.json).

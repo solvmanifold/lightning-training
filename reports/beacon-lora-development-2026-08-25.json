@@ -1,0 +1,53 @@
+{
+  "adapter_serving": {
+    "eager_mode": true,
+    "image": "nvcr.io/nim/nvidia/nemotron-3.5-lightning-30b-a3b:2.0.9-variant",
+    "profile": "15766f03e594ee013d9328b909c1b4bbd432f7f7fcdb5503372b354e34d14662"
+  },
+  "dataset": {
+    "development_cases": 256,
+    "development_sha256": "7da2a9154b8f232f6e17653f8481d4ac7600069366a0b298f57ebd658d11c65a",
+    "locked_test_cases_used_for_selection": 0,
+    "prompt_profile": "compact",
+    "training_cases": 2048,
+    "training_sha256": "5904b74490fca8b1d032f0c20fecf3767f9f06935768cadd973bdcafcac04075"
+  },
+  "selected": {
+    "adapter_sha256": "79d85f72ab9ea9fdb9426e6afefb51db704919cac5449661faaa16c3e3c07ec0",
+    "checkpoint": "epoch_0_step_63",
+    "seed": 1111
+  },
+  "seeds": {
+    "1111": {
+      "adapter_sha256": "79d85f72ab9ea9fdb9426e6afefb51db704919cac5449661faaa16c3e3c07ec0",
+      "config_sha256": "0709460de7de6b1a681dbe58375cc3ee14ecc1df5b1a0d7cc8b1c0659b964981",
+      "exact": 256,
+      "exact_rate": 1.0,
+      "field_precision": 1.0,
+      "field_recall": 1.0,
+      "json_parse_rate": 1.0,
+      "latency_mean_s": 2.8021756707562417,
+      "latency_median_s": 2.7885698874597438,
+      "latency_p95_s": 3.2123755490174517,
+      "schema_valid_rate": 1.0
+    },
+    "2222": {
+      "adapter_sha256": "c63485915cb8cc34f7e375adb02e37ab37d54cc14b29c694295a8024b5b4f01f",
+      "config_sha256": "6b8139c046295fc670f02bdc86abf896840221d92712bd9c9b31f7595ea559d0",
+      "exact": 253,
+      "exact_rate": 0.98828125,
+      "failure_ids": [
+        "beacon-development-00002",
+        "beacon-development-00098",
+        "beacon-development-00255"
+      ],
+      "field_precision": 0.998828125,
+      "field_recall": 0.998828125,
+      "json_parse_rate": 1.0,
+      "latency_mean_s": 2.823553536461077,
+      "latency_median_s": 2.8123716635163873,
+      "latency_p95_s": 3.282858668011613,
+      "schema_valid_rate": 0.9921875
+    }
+  }
+}
