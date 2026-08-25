@@ -1,6 +1,6 @@
 {
   "project": {
-    "name": "Lightning Training",
+    "name": "Nemotron Adaptation Lab",
     "model": "NVIDIA Nemotron 3.5 Lightning",
     "posture": "evaluation first",
     "status": "base model with full prompt selected"
@@ -72,8 +72,8 @@
   },
   "measurement": {
     "date": "2026-08-25",
-    "built_at": "2026-08-25T22:09:28Z",
-    "source_revision": "09403d31ec3234b92f9a0ed5dfa08797a54ae857",
+    "built_at": "2026-08-25T22:22:18Z",
+    "source_revision": "8c354f0a2874bb8365974f994a632439e3386d7b",
     "protocol": "Deterministic Beacon JSON generation; development-only prompt and checkpoint selection; one paired opening of the locked test.",
     "limitations": [
       "Prompt-ladder scores use development cases and are not independent test estimates.",

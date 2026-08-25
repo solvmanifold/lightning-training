@@ -5,13 +5,13 @@
   "data": "brief.json",
   "card": {
     "path": "assets/card.webp",
-    "alt": "Lightning Training decision card showing the base model at 94.92 percent exact versus LoRA at 73.24 percent, with the verdict keep the prompt.",
+    "alt": "Nemotron Adaptation Lab decision card showing the base model at 94.92 percent exact versus LoRA at 73.24 percent, with the verdict keep the prompt.",
     "width": 800,
     "height": 450,
-    "bytes": 19470
+    "bytes": 20062
   },
-  "source_revision": "09403d31ec3234b92f9a0ed5dfa08797a54ae857",
-  "built_at": "2026-08-25T22:09:28Z",
+  "source_revision": "8c354f0a2874bb8365974f994a632439e3386d7b",
+  "built_at": "2026-08-25T22:22:18Z",
   "technologies": {
     "application": [
       "Python",
