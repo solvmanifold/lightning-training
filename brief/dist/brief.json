@@ -141,6 +141,8 @@
     "system_prompt": "Compile the request into one Beacon JSON object and output JSON only. Use exactly these fields: schema_version, action, resource_id, target_region, urgency, execution, encryption, retention_days, compression, notify.\n\nschema_version is `beacon-job-v1`. action is replicate, snapshot, restore, or retire. target_region is one of us-north, us-south, eu-central, ap-east, and is null for snapshot or retire. urgency defaults to normal. execution defaults to apply; previews and dry runs are plan. encryption defaults to standard; sensitive or regulated data is strict. retention defaults are replicate=14, snapshot=30, restore=7, retire=90 days. Weeks are seven days. compression defaults true for replicate/snapshot and false for restore/retire. notify defaults to an empty array and addresses must be sorted. Explicit instructions and final corrections override defaults.",
     "fewshot_case_ids": [],
     "mean_total_input_tokens": 251.51171875,
+    "mean_input_tokens_removed": 963.0,
+    "relative_input_token_reduction": 0.7929112458388949,
     "training_message_order": [
       "compact system prompt",
       "generated user request",
@@ -218,8 +220,8 @@
   },
   "measurement": {
     "date": "2026-08-25",
-    "built_at": "2026-08-25T22:48:52Z",
-    "source_revision": "e8d720d204db020440deb0b253461e25b48fb128",
+    "built_at": "2026-08-25T22:53:58Z",
+    "source_revision": "2884c4d96f4ff9c5183608f34d5079289fd6fa01",
     "protocol": "Deterministic Beacon JSON generation; development-only prompt and checkpoint selection; one paired opening of the locked test.",
     "limitations": [
       "Prompt-ladder scores use development cases and are not independent test estimates.",
