@@ -75,6 +75,10 @@ The completed experiment rejects the tested LoRA: it compressed the prompt by
 schema-invalid output to 5.08%. The full-prompt base model remains the selected
 condition.
 
+For a visual, evidence-led summary, open the committed
+[static project brief](brief/dist/index.html). Rebuild and validate it with
+`python3 brief/build.py && python3 brief/validate.py`.
+
 ## Fine-tuning baseline
 
 The checked-in training configuration is retained as a conditional path, not
