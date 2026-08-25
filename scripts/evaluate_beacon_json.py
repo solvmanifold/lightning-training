@@ -143,6 +143,23 @@ def parse_content(response: dict[str, Any]) -> tuple[object | None, str | None, 
         return None, str(error), content
 
 
+def serving_schema(schema: dict[str, Any]) -> dict[str, Any]:
+    """Remove keywords unsupported by NIM grammar while keeping scorer checks."""
+    value = json.loads(json.dumps(schema))
+
+    def visit(node: object) -> None:
+        if isinstance(node, dict):
+            node.pop("uniqueItems", None)
+            for child in node.values():
+                visit(child)
+        elif isinstance(node, list):
+            for child in node:
+                visit(child)
+
+    visit(value)
+    return value
+
+
 def append_jsonl(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
@@ -245,7 +262,11 @@ def main() -> int:
     if args.prompt_profile == "constrained":
         config["response_format"] = {
             "type": "json_schema",
-            "json_schema": {"name": "beacon_job", "strict": True, "schema": schema},
+            "json_schema": {
+                "name": "beacon_job",
+                "strict": True,
+                "schema": serving_schema(schema),
+            },
         }
     signature = hashlib.sha256(
         json.dumps(
@@ -272,6 +293,9 @@ def main() -> int:
             "dataset": str(dataset.relative_to(root)),
             "dataset_sha256": sha256(dataset),
             "endpoint": args.endpoint,
+            "constrained_schema_omissions": (
+                ["uniqueItems"] if args.prompt_profile == "constrained" else []
+            ),
             "evaluation_git_dirty": bool(git_value(root, ["status", "--porcelain"])),
             "evaluation_git_revision": git_value(root, ["rev-parse", "HEAD"]),
             "evaluator_sha256": sha256(Path(__file__).resolve()),

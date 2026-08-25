@@ -100,3 +100,7 @@ python3 scripts/evaluate_beacon_json.py --prompt-profile constrained --run-id co
 
 Use `--limit 64` for a resumable smoke run. Do not point the evaluator at
 `test.jsonl` until a development condition is frozen.
+
+NIM's grammar backend does not implement JSON Schema `uniqueItems`. The
+constrained condition omits that keyword from the serving schema while the
+post-generation semantic validator continues to enforce unique notifications.
