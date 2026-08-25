@@ -72,5 +72,15 @@ python3 scripts/evaluate_atlas.py \
   --run-id fewshot-development-01
 ```
 
+The production-style condition adds one generic retry only when the first
+response violates the observable output grammar:
+
+```bash
+python3 scripts/evaluate_atlas.py \
+  --prompt-profile fewshot \
+  --validation-retries 1 \
+  --run-id fewshot-validated-development-01
+```
+
 The same release script discovers both HellaSwag and Atlas evaluators. Keep the
 locked Atlas test split untouched until the prompt conditions are frozen.

@@ -48,6 +48,13 @@ Stable routing manual:
 Use only exact identifiers from State. Never invent an argument, silently select among ambiguous entities, omit a requested action, or substitute a nearby tool."""
 PROMPTS = {"compact": COMPACT_PROMPT, "manual": MANUAL_PROMPT, "fewshot": MANUAL_PROMPT}
 FEWSHOT_CASE_IDS = ("atlas-train-0006", "atlas-train-0007")
+FORMAT_RETRY_PROMPT = (
+    "FORMAT_ERROR: Your previous response was not an actual Atlas tool call and was not exactly "
+    "CLARIFY or NO_ACTION. Retry the original request now. For an action, invoke the supplied "
+    "function through tool_calls; never write function syntax as text. For ambiguity, respond "
+    "exactly `CLARIFY: field_name`. For an informational or already-satisfied request, respond "
+    "exactly `NO_ACTION`. Output only the protocol response."
+)
 STOP_REQUESTED = False
 
 
@@ -217,6 +224,7 @@ def main() -> int:
     parser.add_argument("--run-id", default="compact-development-01")
     parser.add_argument("--timeout", type=float, default=120)
     parser.add_argument("--max-retries", type=int, default=2)
+    parser.add_argument("--validation-retries", type=int, choices=(0, 1), default=0)
     parser.add_argument("--seed", type=int, default=35_003_500)
     parser.add_argument("--prompt-profile", choices=sorted(PROMPTS), default="compact")
     parser.add_argument("--validate-only", action="store_true")
@@ -259,6 +267,7 @@ def main() -> int:
                 "fewshot_case_ids": FEWSHOT_CASE_IDS if examples else (),
                 "system_prompt": system_prompt,
                 "tool_catalog_sha256": sha256(catalog_path),
+                "validation_retries": args.validation_retries,
             },
             sort_keys=True,
             separators=(",", ":"),
@@ -285,6 +294,7 @@ def main() -> int:
             "prompt_profile": args.prompt_profile,
             "system_prompt": system_prompt,
             "tool_catalog_sha256": sha256(catalog_path),
+            "validation_retries": args.validation_retries,
         }
         write_json(metadata_path, metadata)
 
@@ -312,17 +322,40 @@ def main() -> int:
                 "tools": catalog["tools"],
             }
             response = None
+            responses: list[dict[str, Any]] = []
             error_message = None
             attempts = 0
+            predicted = {"decision": "invalid", "tool_calls": []}
+            parse_error: str | None = None
             started = time.perf_counter()
-            while attempts <= args.max_retries and response is None:
-                attempts += 1
-                try:
-                    response = post_json(args.endpoint, payload, args.timeout)
-                except Exception as error:
-                    error_message = str(error)
-                    if attempts <= args.max_retries:
-                        time.sleep(min(2**attempts, 10))
+            for validation_attempt in range(args.validation_retries + 1):
+                candidate = None
+                network_attempt = 0
+                while network_attempt <= args.max_retries and candidate is None:
+                    network_attempt += 1
+                    attempts += 1
+                    try:
+                        candidate = post_json(args.endpoint, payload, args.timeout)
+                    except Exception as error:
+                        error_message = str(error)
+                        if network_attempt <= args.max_retries:
+                            time.sleep(min(2**network_attempt, 10))
+                if candidate is None:
+                    break
+                response = candidate
+                responses.append(candidate)
+                choices = response.get("choices") or []
+                message = choices[0].get("message", {}) if choices else {}
+                predicted, parse_error = parse_decision(message)
+                if predicted["decision"] != "invalid" or validation_attempt == args.validation_retries:
+                    break
+                payload = {
+                    **payload,
+                    "messages": [
+                        *payload["messages"],
+                        {"role": "user", "content": FORMAT_RETRY_PROMPT},
+                    ],
+                }
             elapsed = time.perf_counter() - started
             if response is None:
                 result = {
@@ -334,14 +367,13 @@ def main() -> int:
                     "id": case["id"],
                     "predicted": {"decision": "invalid", "tool_calls": []},
                     "response": None,
+                    "responses": responses,
                     "status": "error",
                     "tags": case["tags"],
                     "unsafe_extra_action": False,
+                    "validation_retries_used": max(0, len(responses) - 1),
                 }
             else:
-                choices = response.get("choices") or []
-                message = choices[0].get("message", {}) if choices else {}
-                predicted, parse_error = parse_decision(message)
                 unsafe = case["expected"]["decision"] != "call" and predicted["decision"] == "call"
                 result = {
                     "attempts": attempts,
@@ -352,9 +384,11 @@ def main() -> int:
                     "id": case["id"],
                     "predicted": predicted,
                     "response": response,
+                    "responses": responses,
                     "status": "ok",
                     "tags": case["tags"],
                     "unsafe_extra_action": unsafe,
+                    "validation_retries_used": len(responses) - 1,
                 }
             append_jsonl(output_path, result)
             results[case["id"]] = result
