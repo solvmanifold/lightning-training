@@ -33,6 +33,63 @@
     "locked_test_cases": 512,
     "split_policy": "disjoint surface-language families"
   },
+  "concrete_example": {
+    "case_id": "beacon-train-00000",
+    "split": "train",
+    "input": "Copy res_tr_00000 over to us-north. Preview it only; do not apply changes. Correction: use 14 retention days, not 19. Actually, final urgency is low, not high. Treat the resource as regulated and use strict encryption. This can wait. Compress the stored data.",
+    "output": {
+      "action": "replicate",
+      "compression": true,
+      "encryption": "strict",
+      "execution": "plan",
+      "notify": [],
+      "resource_id": "res_tr_00000",
+      "retention_days": 14,
+      "schema_version": "beacon-job-v1",
+      "target_region": "us-north",
+      "urgency": "low"
+    }
+  },
+  "winning_prompt": {
+    "profile": "final",
+    "system_prompt": "You are the Beacon canonical-job compiler. Return exactly one JSON object with no Markdown, explanation, or extra keys.\n\nRequired fields and allowed values:\n- schema_version: always `beacon-job-v1`\n- action: `replicate`, `snapshot`, `restore`, or `retire`\n- resource_id: copy the exact res_* identifier\n- target_region: `us-north`, `us-south`, `eu-central`, `ap-east`, or null\n- urgency: `low`, `normal`, `high`, or `critical`\n- execution: `plan` or `apply`\n- encryption: `standard` or `strict`\n- retention_days: integer from 1 through 365\n- compression: boolean\n- notify: sorted unique array of exact email addresses\n\nInterpretation manual:\n- Mirror, copy, fan out, or create a regional replica means replicate. Replicate requires the named target region.\n- Checkpoint, back up, capture a point-in-time copy, or preserve current state means snapshot. Snapshot target_region is null.\n- Recover, restore, roll back, or reconstitute means restore. Restore requires the named target region.\n- Decommission, retire, take out of rotation, or sunset means retire. Retire target_region is null.\n- No rush or whenever capacity permits means low. Ordinary scheduling means normal. Today or close of business means high. An incident, emergency, impaired production, immediately, or without delay means critical. Default is normal.\n- Preview, simulate, or dry run means execution=plan. Otherwise execution=apply.\n- Sensitive or regulated data requires encryption=strict. Otherwise use standard.\n- Convert weeks to seven days. Defaults are replicate=14, snapshot=30, restore=7, and retire=90 days.\n- Explicit compression or no-compression language overrides defaults. Defaults are true for replicate/snapshot and false for restore/retire.\n- Copy notification addresses exactly, remove duplicates, and sort ascending. Default is an empty array.\n- Apply all explicit clauses regardless of sentence order. If the request corrects itself, the final corrected value wins.\n\nDisambiguation rules:\n- A snapshot/checkpoint is a real applied action, not automatically a plan. Set execution=plan only when the request explicitly says preview, simulate, dry run, or no side effects; otherwise execution=apply for every action.\n- Never infer urgency from an action being destructive, permanent, a restore, or a snapshot. `Today`, `before today ends`, and `close of business` are high. Only explicit incident, emergency, impaired-production, immediately, right-now, or without-delay language is critical.\n\n- When the request has no urgency phrase, urgency is normal\u2014never low. Low requires explicit no-rush, can-wait, or whenever-capacity-permits language.\n- Urgency and action language never imply encryption. Incident, emergency, restore, retirement, permanence, and critical urgency still use encryption=standard unless the request explicitly says sensitive, regulated, strict encryption, or lock encryption down.",
+    "fewshot_case_ids": [
+      "beacon-train-00000",
+      "beacon-train-00001",
+      "beacon-train-00004",
+      "beacon-train-00007"
+    ],
+    "mean_total_input_tokens": 1216,
+    "response_format": "unconstrained JSON text with independent validation"
+  },
+  "experiment_sequence": [
+    {
+      "name": "HellaSwag chat-MC",
+      "purpose": "inference evaluation smoke",
+      "cases": 10042,
+      "result": "84.58% strict accuracy"
+    },
+    {
+      "name": "Atlas routing",
+      "purpose": "tool-use smoke",
+      "result": "37/40 frozen test; no LoRA justified"
+    },
+    {
+      "name": "Beacon prompt ladder",
+      "purpose": "decision baseline",
+      "result": "486/512 locked-test exact"
+    },
+    {
+      "name": "NVIDIA HellaSwag recipe",
+      "purpose": "20-step training infrastructure smoke",
+      "result": "training and checkpoint path proven"
+    },
+    {
+      "name": "Beacon LoRA",
+      "purpose": "controlled behavioral compression",
+      "result": "375/512; adapter rejected"
+    }
+  ],
   "prompt_ladder": [
     {
       "condition": "Compact",
@@ -72,8 +129,8 @@
   },
   "measurement": {
     "date": "2026-08-25",
-    "built_at": "2026-08-25T22:22:18Z",
-    "source_revision": "8c354f0a2874bb8365974f994a632439e3386d7b",
+    "built_at": "2026-08-25T22:32:49Z",
+    "source_revision": "6fb863e0eb9ee6a099b657a3fccc92155526ee94",
     "protocol": "Deterministic Beacon JSON generation; development-only prompt and checkpoint selection; one paired opening of the locked test.",
     "limitations": [
       "Prompt-ladder scores use development cases and are not independent test estimates.",
