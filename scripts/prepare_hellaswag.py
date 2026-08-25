@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Download pinned HellaSwag validation data and build a chat-MC smoke set."""
+"""Download pinned HellaSwag validation data and build chat-MC artifacts."""
 
 from __future__ import annotations
 
@@ -68,50 +68,54 @@ def prompt(row: dict[str, object]) -> str:
     return f"Context: {row['ctx']}\n\nContinuations:\n{choices}\n\nAnswer:"
 
 
+def normalize(source: dict[str, object]) -> dict[str, object]:
+    label_index = int(source["label"])
+    return {
+        "id": f"hellaswag-val-{int(source['ind']):05d}",
+        "suite": "hellaswag-chat-mc",
+        "messages": [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt(source)},
+        ],
+        "expected": {
+            "label": "ABCD"[label_index],
+            "label_index": label_index,
+        },
+        "scorers": ["strict_mc_label"],
+        "metadata": {
+            "source_ind": int(source["ind"]),
+            "split": source["split"],
+            "split_type": source["split_type"],
+            "activity_label": source["activity_label"],
+        },
+    }
+
+
+def write_jsonl(path: Path, rows: list[dict[str, object]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "".join(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+
+
 def prepare(repo_root: Path) -> None:
     source_path = repo_root / "data/raw/hellaswag/hellaswag_val.jsonl"
-    output_path = repo_root / "data/hellaswag/chat_mc_smoke_100.jsonl"
+    smoke_path = repo_root / "data/hellaswag/chat_mc_smoke_100.jsonl"
+    full_path = repo_root / "data/derived/hellaswag/chat_mc_validation_10042.jsonl"
     manifest_path = repo_root / "data/hellaswag/manifest.json"
     download(source_path)
 
     rows: list[dict[str, object]] = []
-    source_count = 0
     with source_path.open(encoding="utf-8") as handle:
         for line in handle:
-            source = json.loads(line)
-            if source_count < SMOKE_ROWS:
-                label_index = int(source["label"])
-                rows.append(
-                    {
-                        "id": f"hellaswag-val-{int(source['ind']):05d}",
-                        "suite": "hellaswag-chat-mc",
-                        "messages": [
-                            {"role": "system", "content": SYSTEM_PROMPT},
-                            {"role": "user", "content": prompt(source)},
-                        ],
-                        "expected": {
-                            "label": "ABCD"[label_index],
-                            "label_index": label_index,
-                        },
-                        "scorers": ["strict_mc_label"],
-                        "metadata": {
-                            "source_ind": int(source["ind"]),
-                            "split": source["split"],
-                            "split_type": source["split_type"],
-                            "activity_label": source["activity_label"],
-                        },
-                    }
-                )
-            source_count += 1
+            rows.append(normalize(json.loads(line)))
 
-    if source_count != SOURCE_ROWS:
-        raise RuntimeError(f"expected {SOURCE_ROWS} source rows, got {source_count}")
+    if len(rows) != SOURCE_ROWS:
+        raise RuntimeError(f"expected {SOURCE_ROWS} source rows, got {len(rows)}")
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(
-        "".join(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n" for row in rows),
-        encoding="utf-8",
-    )
+    write_jsonl(smoke_path, rows[:SMOKE_ROWS])
+    write_jsonl(full_path, rows)
     prompt_hash = hashlib.sha256(
         json.dumps(
             {"system": SYSTEM_PROMPT, "user_template": USER_TEMPLATE_ID},
@@ -123,9 +127,14 @@ def prepare(repo_root: Path) -> None:
         manifest_path,
         {
             "artifact": {
-                "path": str(output_path.relative_to(repo_root)),
+                "path": str(smoke_path.relative_to(repo_root)),
+                "rows": SMOKE_ROWS,
+                "sha256": sha256(smoke_path),
+            },
+            "full_artifact": {
+                "path": str(full_path.relative_to(repo_root)),
                 "rows": len(rows),
-                "sha256": sha256(output_path),
+                "sha256": sha256(full_path),
             },
             "generator": {
                 "path": "scripts/prepare_hellaswag.py",

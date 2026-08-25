@@ -21,6 +21,15 @@ The fixed protocol uses temperature zero, seed `35003500`, thinking off, and
 captures top-label log probabilities. Exact output labels remain the chat-MC
 score; the log probabilities help diagnose near-boundary disagreements.
 
+After two smoke passes have identical predictions, start or resume the full
+validation run:
+
+```bash
+python3 scripts/evaluate_hellaswag_chat.py \
+  --dataset data/derived/hellaswag/chat_mc_validation_10042.jsonl \
+  --run-id validation-full-01
+```
+
 ## Pause and release the GPU
 
 From another terminal:

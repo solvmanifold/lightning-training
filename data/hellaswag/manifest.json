@@ -4,9 +4,14 @@
     "rows": 100,
     "sha256": "c86efd3f3907d226d7d9c16a47521110a1ad42d81e9514f4e9fad32fc5be4cc6"
   },
+  "full_artifact": {
+    "path": "data/derived/hellaswag/chat_mc_validation_10042.jsonl",
+    "rows": 10042,
+    "sha256": "79646f411169fd603d20c95bf49765c863b571c2bb5bcbf5defb51113083a995"
+  },
   "generator": {
     "path": "scripts/prepare_hellaswag.py",
-    "sha256": "774a376d93303d58cb0ded10cb68692f6cc7189c1e16a7297870be35bb6772e5"
+    "sha256": "a20ac568c55df4a9ed924a6f8ab4b0d6092e572a9cfe748bd53b94acc1f22e37"
   },
   "prompt_sha256": "e259243e6022fdd1dcaf6ff9a6b79d5c68857ff2fbc55e0cbc06521395efe6a5",
   "protocol": "hellaswag-chat-mc",

@@ -1,6 +1,7 @@
 outputs/
 .cache/
 data/raw/
+data/derived/
 __pycache__/
 *.py[cod]
 .env

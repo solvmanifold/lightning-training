@@ -38,6 +38,11 @@ def main() -> None:
     hellaswag = verify_artifact(root, hellaswag_manifest["artifact"])
     if any(row["expected"]["label"] not in "ABCD" for row in hellaswag):
         raise RuntimeError("invalid HellaSwag label")
+    full_path = root / hellaswag_manifest["full_artifact"]["path"]
+    if full_path.exists():
+        full_hellaswag = verify_artifact(root, hellaswag_manifest["full_artifact"])
+        if any(row["expected"]["label"] not in "ABCD" for row in full_hellaswag):
+            raise RuntimeError("invalid full HellaSwag label")
 
     atlas_manifest = json.loads((root / "data/synthetic/atlas_smoke/manifest.json").read_text())
     atlas_generator = atlas_manifest["generator"]
@@ -83,6 +88,8 @@ def main() -> None:
                     raise RuntimeError(f"{row['id']}: invalid {name}.{key} value {value}")
 
     print(f"verified {len(hellaswag)} HellaSwag smoke cases")
+    if full_path.exists():
+        print(f"verified {len(full_hellaswag)} full HellaSwag cases")
     print(f"verified {len(atlas)} Atlas smoke cases")
 
 
