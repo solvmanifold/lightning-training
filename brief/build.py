@@ -163,6 +163,8 @@ def main() -> None:
             "system_prompt": compact_prompt,
             "fewshot_case_ids": [],
             "mean_total_input_tokens": 251.51171875,
+            "mean_input_tokens_removed": 963.0,
+            "relative_input_token_reduction": 0.7929112458388949,
             "training_message_order": ["compact system prompt", "generated user request", "expected assistant JSON"],
             "inference_message_order": ["compact system prompt", "unseen user request"],
         },

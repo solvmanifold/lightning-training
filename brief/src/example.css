@@ -190,6 +190,12 @@
 .generator-flow i { color: var(--cyan); font-style: normal; }
 
 .condition-head { max-width: 800px; margin-bottom: 1.5rem; }
+.condition-head > p:last-child { color: #aeb5b2; }
+.payoff { display: grid; grid-template-columns: .55fr .55fr 1.4fr; gap: 3px; margin-bottom: 1.2rem; }
+.payoff > div,.payoff > p { margin: 0; padding: 1.3rem; background: #20272a; }
+.payoff span,.payoff small { display: block; color: #929a97; font-size: .72rem; }
+.payoff strong { display: block; color: var(--acid); font: 400 2.6rem var(--serif); }
+.payoff > p { display: flex; align-items: center; color: #b3bab7; font-size: .82rem; }
 .condition-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
 .condition { padding: clamp(1.3rem, 3vw, 2.2rem); border: 1px solid var(--line); background: #171d20; }
 .base-condition { border-top: 6px solid var(--acid); }
@@ -205,18 +211,24 @@
 .condition > p { margin: 1.5rem 0 0; }
 .base-condition > p strong { color: var(--acid); }
 .lora-condition > p strong { color: var(--ember); }
-.compact-details { margin: 1.2rem 0 5rem; }
+.compact-details { margin: 1.2rem 0 5rem; border-color: var(--ember); }
+.prompt-label { display: flex; justify-content: space-between; gap: 1rem; padding: 1.2rem 1.4rem; border-bottom: 1px solid var(--line); font-weight: 750; }
+.prompt-label small { color: #a09794; font-weight: 400; }
+.prompt-visible pre { color: #fff1ed; white-space: pre-wrap; }
+.prompt-foot { margin: 0; padding: 0 1.4rem 1.2rem; color: #a09794; font-size: .75rem; }
 
 @media (max-width: 800px) {
   .io-grid,
   .prompt-intro,
   .generator-note,
-  .condition-grid { grid-template-columns: 1fr; }
+  .condition-grid,
+  .payoff { grid-template-columns: 1fr; }
   .message-stack { grid-template-columns: 1fr; }
   .shots-grid { grid-template-columns: 1fr 1fr; }
   .shots-grid p { min-height: 0; }
   .prompt-intro { gap: 1rem; }
   .prompt-details summary { flex-direction: column; }
+  .prompt-label { flex-direction: column; }
   .experiment-list li { grid-template-columns: 45px 1fr; }
   .experiment-verdict { grid-column: 2; }
 }
