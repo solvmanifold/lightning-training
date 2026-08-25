@@ -21,7 +21,12 @@ from beacon_schema import field_counts, validate_beacon
 
 DEFAULT_ENDPOINT = "http://localhost:8011/v1/chat/completions"
 DEFAULT_MODEL = "nvidia/nemotron-3.5-lightning"
-FEWSHOT_CASE_IDS = ("beacon-train-00000", "beacon-train-00007")
+BASIC_FEWSHOT_CASE_IDS = ("beacon-train-00000", "beacon-train-00007")
+OPTIMIZED_FEWSHOT_CASE_IDS = (
+    "beacon-train-00000",
+    "beacon-train-00001",
+    "beacon-train-00007",
+)
 STOP_REQUESTED = False
 
 COMPACT_PROMPT = """Compile the request into one Beacon JSON object and output JSON only. Use exactly these fields: schema_version, action, resource_id, target_region, urgency, execution, encryption, retention_days, compression, notify.
@@ -55,11 +60,19 @@ Interpretation manual:
 - Copy notification addresses exactly, remove duplicates, and sort ascending. Default is an empty array.
 - Apply all explicit clauses regardless of sentence order. If the request corrects itself, the final corrected value wins."""
 
+OPTIMIZED_PROMPT = MANUAL_PROMPT + """
+
+Disambiguation rules:
+- A snapshot/checkpoint is a real applied action, not automatically a plan. Set execution=plan only when the request explicitly says preview, simulate, dry run, or no side effects; otherwise execution=apply for every action.
+- Never infer urgency from an action being destructive, permanent, a restore, or a snapshot. `Today`, `before today ends`, and `close of business` are high. Only explicit incident, emergency, impaired-production, immediately, right-now, or without-delay language is critical."""
+
 PROMPTS = {
     "compact": COMPACT_PROMPT,
     "manual": MANUAL_PROMPT,
     "fewshot": MANUAL_PROMPT,
     "constrained": MANUAL_PROMPT,
+    "optimized": OPTIMIZED_PROMPT,
+    "constrained_optimized": OPTIMIZED_PROMPT,
 }
 
 
@@ -92,13 +105,13 @@ def load_jsonl(path: Path, limit: int | None = None) -> list[dict[str, Any]]:
     return rows
 
 
-def fewshot_messages(root: Path) -> list[dict[str, Any]]:
+def fewshot_messages(root: Path, case_ids: tuple[str, ...]) -> list[dict[str, Any]]:
     training = {
         row["id"]: row
         for row in load_jsonl(root / "data/synthetic/beacon_json/train.jsonl")
     }
     messages: list[dict[str, Any]] = []
-    for case_id in FEWSHOT_CASE_IDS:
+    for case_id in case_ids:
         case = training[case_id]
         messages.extend(
             [
@@ -233,9 +246,13 @@ def main() -> int:
     schema_path = args.schema.resolve()
     cases = load_jsonl(dataset, args.limit)
     schema = json.loads(schema_path.read_text())
-    examples = (
-        fewshot_messages(root) if args.prompt_profile in {"fewshot", "constrained"} else []
-    )
+    if args.prompt_profile in {"fewshot", "constrained"}:
+        example_ids = BASIC_FEWSHOT_CASE_IDS
+    elif args.prompt_profile in {"optimized", "constrained_optimized"}:
+        example_ids = OPTIMIZED_FEWSHOT_CASE_IDS
+    else:
+        example_ids = ()
+    examples = fewshot_messages(root, example_ids) if example_ids else []
     if args.validate_only:
         for case in cases:
             errors = validate_beacon(case["expected"])
@@ -259,7 +276,7 @@ def main() -> int:
         "temperature": 0,
         "top_p": 1,
     }
-    if args.prompt_profile == "constrained":
+    if args.prompt_profile in {"constrained", "constrained_optimized"}:
         config["response_format"] = {
             "type": "json_schema",
             "json_schema": {
@@ -274,7 +291,7 @@ def main() -> int:
                 "case_ids": [case["id"] for case in cases],
                 "config": config,
                 "dataset_sha256": sha256(dataset),
-                "fewshot_case_ids": FEWSHOT_CASE_IDS if examples else (),
+                "fewshot_case_ids": example_ids,
                 "prompt": PROMPTS[args.prompt_profile],
                 "prompt_profile": args.prompt_profile,
                 "schema_sha256": sha256(schema_path),
@@ -294,12 +311,14 @@ def main() -> int:
             "dataset_sha256": sha256(dataset),
             "endpoint": args.endpoint,
             "constrained_schema_omissions": (
-                ["uniqueItems"] if args.prompt_profile == "constrained" else []
+                ["uniqueItems"]
+                if args.prompt_profile in {"constrained", "constrained_optimized"}
+                else []
             ),
             "evaluation_git_dirty": bool(git_value(root, ["status", "--porcelain"])),
             "evaluation_git_revision": git_value(root, ["rev-parse", "HEAD"]),
             "evaluator_sha256": sha256(Path(__file__).resolve()),
-            "fewshot_case_ids": FEWSHOT_CASE_IDS if examples else (),
+            "fewshot_case_ids": example_ids,
             "model_config": config,
             "models_response": get_json(models_url),
             "prompt": PROMPTS[args.prompt_profile],

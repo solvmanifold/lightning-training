@@ -96,6 +96,8 @@ python3 scripts/evaluate_beacon_json.py --prompt-profile compact --run-id compac
 python3 scripts/evaluate_beacon_json.py --prompt-profile manual --run-id manual-development-01
 python3 scripts/evaluate_beacon_json.py --prompt-profile fewshot --run-id fewshot-development-01
 python3 scripts/evaluate_beacon_json.py --prompt-profile constrained --run-id constrained-development-01
+python3 scripts/evaluate_beacon_json.py --prompt-profile optimized --run-id optimized-development-01
+python3 scripts/evaluate_beacon_json.py --prompt-profile constrained_optimized --run-id constrained-optimized-development-01
 ```
 
 Use `--limit 64` for a resumable smoke run. Do not point the evaluator at
