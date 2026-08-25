@@ -27,6 +27,12 @@ OPTIMIZED_FEWSHOT_CASE_IDS = (
     "beacon-train-00001",
     "beacon-train-00007",
 )
+FINAL_FEWSHOT_CASE_IDS = (
+    "beacon-train-00000",
+    "beacon-train-00001",
+    "beacon-train-00004",
+    "beacon-train-00007",
+)
 STOP_REQUESTED = False
 
 COMPACT_PROMPT = """Compile the request into one Beacon JSON object and output JSON only. Use exactly these fields: schema_version, action, resource_id, target_region, urgency, execution, encryption, retention_days, compression, notify.
@@ -66,6 +72,11 @@ Disambiguation rules:
 - A snapshot/checkpoint is a real applied action, not automatically a plan. Set execution=plan only when the request explicitly says preview, simulate, dry run, or no side effects; otherwise execution=apply for every action.
 - Never infer urgency from an action being destructive, permanent, a restore, or a snapshot. `Today`, `before today ends`, and `close of business` are high. Only explicit incident, emergency, impaired-production, immediately, right-now, or without-delay language is critical."""
 
+FINAL_PROMPT = OPTIMIZED_PROMPT + """
+
+- When the request has no urgency phrase, urgency is normal—never low. Low requires explicit no-rush, can-wait, or whenever-capacity-permits language.
+- Urgency and action language never imply encryption. Incident, emergency, restore, retirement, permanence, and critical urgency still use encryption=standard unless the request explicitly says sensitive, regulated, strict encryption, or lock encryption down."""
+
 PROMPTS = {
     "compact": COMPACT_PROMPT,
     "manual": MANUAL_PROMPT,
@@ -73,6 +84,8 @@ PROMPTS = {
     "constrained": MANUAL_PROMPT,
     "optimized": OPTIMIZED_PROMPT,
     "constrained_optimized": OPTIMIZED_PROMPT,
+    "final": FINAL_PROMPT,
+    "constrained_final": FINAL_PROMPT,
 }
 
 
@@ -250,6 +263,8 @@ def main() -> int:
         example_ids = BASIC_FEWSHOT_CASE_IDS
     elif args.prompt_profile in {"optimized", "constrained_optimized"}:
         example_ids = OPTIMIZED_FEWSHOT_CASE_IDS
+    elif args.prompt_profile in {"final", "constrained_final"}:
+        example_ids = FINAL_FEWSHOT_CASE_IDS
     else:
         example_ids = ()
     examples = fewshot_messages(root, example_ids) if example_ids else []
@@ -276,7 +291,7 @@ def main() -> int:
         "temperature": 0,
         "top_p": 1,
     }
-    if args.prompt_profile in {"constrained", "constrained_optimized"}:
+    if args.prompt_profile in {"constrained", "constrained_optimized", "constrained_final"}:
         config["response_format"] = {
             "type": "json_schema",
             "json_schema": {
@@ -312,7 +327,8 @@ def main() -> int:
             "endpoint": args.endpoint,
             "constrained_schema_omissions": (
                 ["uniqueItems"]
-                if args.prompt_profile in {"constrained", "constrained_optimized"}
+                if args.prompt_profile
+                in {"constrained", "constrained_optimized", "constrained_final"}
                 else []
             ),
             "evaluation_git_dirty": bool(git_value(root, ["status", "--porcelain"])),
