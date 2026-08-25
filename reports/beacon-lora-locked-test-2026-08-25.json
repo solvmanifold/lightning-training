@@ -1,0 +1,83 @@
+{
+  "comparison": {
+    "base_full_prompt": {
+      "exact": 486,
+      "exact_rate": 0.94921875,
+      "latency_mean_s": 1.1366924148101134,
+      "prompt_tokens_mean": 1214.51171875,
+      "schema_valid_rate": 1.0
+    },
+    "lora_compact_prompt": {
+      "completion_tokens_mean": 73.87890625,
+      "exact": 375,
+      "exact_rate": 0.732421875,
+      "exact_wilson_95": [
+        0.6924489815710526,
+        0.7689330883077636
+      ],
+      "field_precision": 0.9591796875,
+      "field_recall": 0.9591796875,
+      "json_parse_rate": 1.0,
+      "latency_mean_s": 2.8099782074048107,
+      "latency_median_s": 2.820641792495735,
+      "latency_p95_s": 3.2486825039377436,
+      "prompt_tokens_mean": 251.51171875,
+      "schema_valid_rate": 0.94921875
+    },
+    "paired": {
+      "base_only_correct": 114,
+      "both_correct": 372,
+      "both_wrong": 23,
+      "difference_percentage_points": -21.6796875,
+      "difference_percentile_bootstrap_95_percentage_points": [
+        -25.390625,
+        -17.96875
+      ],
+      "lora_only_correct": 3,
+      "prompt_token_reduction": 0.7929112458388949
+    }
+  },
+  "dataset": {
+    "cases": 512,
+    "sha256": "3b7f8129eb9f4b9c6779f6f0ea3e2c200ee97688d956677dd9e7e379c9f2ee9a"
+  },
+  "evaluation": {
+    "git_revision": "7c4c6568bad8998cbc53881f917faf37eb308705",
+    "git_worktree_dirty": false,
+    "prompt_profile": "compact",
+    "run_id": "lora-seed1111-step63-locked-test",
+    "run_signature": "8cb3f66a93b99da0affa1ccec1d6aca1bfe81b4af54e6f4b14e7dcdde9b65a98"
+  },
+  "failure_taxonomy": {
+    "by_expected_action": {
+      "replicate": 41,
+      "restore": 41,
+      "retire": 9,
+      "snapshot": 46
+    },
+    "field_mismatches": {
+      "action": 39,
+      "compression": 104,
+      "execution": 2,
+      "notify": 4,
+      "retention_days": 41,
+      "target_region": 2,
+      "urgency": 17
+    },
+    "schema_errors": {
+      "action_forbids_target_region": 25,
+      "action_requires_target_region": 1
+    }
+  },
+  "selected_adapter": {
+    "checkpoint": "epoch_0_step_63",
+    "seed": 1111,
+    "sha256": "79d85f72ab9ea9fdb9426e6afefb51db704919cac5449661faaa16c3e3c07ec0"
+  },
+  "serving": {
+    "eager_mode": true,
+    "image": "nvcr.io/nim/nvidia/nemotron-3.5-lightning-30b-a3b:2.0.9-variant",
+    "profile": "15766f03e594ee013d9328b909c1b4bbd432f7f7fcdb5503372b354e34d14662"
+  },
+  "verdict": "do_not_deploy_lora"
+}

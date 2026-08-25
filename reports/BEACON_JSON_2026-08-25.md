@@ -7,11 +7,27 @@ on the locked test set. All 512 responses parsed as JSON and passed the schema;
 top-level field precision and recall were both 99.49%. The Wilson 95%
 confidence interval for exact success is 92.66–96.51%.
 
-This result justifies a controlled LoRA experiment, not deployment of a LoRA.
-The base model already solves most cases with prompting, while the selected
-condition consumes about 1,215 input tokens per request. A LoRA now has a fair,
-precommitted target: preserve that behavior under the compact prompt, or close
-the remaining stable semantic gap.
+The controlled LoRA experiment is now complete and **does not justify deploying
+the adapter**. Seed 1111 at step 63, selected on development before the test was
+opened, scored **375/512 (73.24%) exact** with the compact prompt. JSON parse
+rate was 100%, schema validity was 94.92%, and field precision/recall were
+95.92%. Its Wilson 95% interval for exact success is 69.24–76.89%.
+
+In the paired comparison, the LoRA was correct on three cases the full-prompt
+base missed, while the base alone was correct on 114. The exact-rate difference
+was **−21.68 percentage points**; a deterministic 100,000-resample paired
+percentile-bootstrap 95% interval was −25.39 to −17.97 points. The adapter cut
+mean prompt tokens from 1,214.5 to 251.5 (79.3%), but it did not finish within
+the allowed one percentage point of base quality. Its 26 schema-invalid outputs
+(5.08%) also exceeded the precommitted <1% limit.
+
+Operationally, eager-mode LoRA serving averaged 2.810 seconds per request
+(p95 3.249 seconds), versus 1.137 seconds for the compiled base/full-prompt
+condition. These are not a controlled cache-throughput benchmark, but they
+eliminate latency as a compensating benefit in the tested deployment path.
+Retain the full prompt and base model for this workload. Do not modify this
+adapter or dataset based on the opened test failures; any follow-up training
+experiment needs newly generated surface families and a new locked test.
 
 ## Protocol
 
@@ -125,7 +141,29 @@ the selected adapter. Its SHA-256 is
 `79d85f72ab9ea9fdb9426e6afefb51db704919cac5449661faaa16c3e3c07ec0`.
 No LoRA test case was used for schedule or seed selection.
 
-## Decision gate
+## LoRA locked-test failure taxonomy
+
+The selected LoRA failed 137 test cases. Field mismatch counts overlap when a
+single object has multiple wrong fields:
+
+| Field | Mismatches |
+| --- | ---: |
+| compression | 104 |
+| retention_days | 41 |
+| action | 39 |
+| urgency | 17 |
+| notify | 4 |
+| execution | 2 |
+| target_region | 2 |
+
+Failures by expected action were snapshot 46/128, replicate 41/128, restore
+41/128, and retire 9/128. Twenty-five schema failures paired an action that
+forbids a target region with a non-null region; one had an action missing its
+required target region. The breadth of compression, retention, action, and
+urgency errors means JSON constraints or a single deterministic postprocessor
+would not recover the lost semantics.
+
+## Precommitted decision gate
 
 Proceed with the NVIDIA-recipe infrastructure smoke and then a small LoRA
 experiment. Do not call fine-tuning successful unless the adapter satisfies
@@ -143,6 +181,12 @@ requires measured cold-prefix, warm-prefix, and representative mixed-load
 latency/throughput. Adapter serving, rollback, invalid-output rate below 1%,
 and regression limits remain mandatory.
 
+Outcome: the LoRA failed the quality and invalid-output requirements, so the
+operational gate cannot rescue it. No adapter deployment or regression-suite
+expansion is warranted for this candidate.
+
 Aggregate metrics are in
 [`beacon-json-2026-08-25.json`](beacon-json-2026-08-25.json) and
 [`beacon-lora-development-2026-08-25.json`](beacon-lora-development-2026-08-25.json).
+The final adapter comparison is in
+[`beacon-lora-locked-test-2026-08-25.json`](beacon-lora-locked-test-2026-08-25.json).

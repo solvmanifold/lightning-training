@@ -70,6 +70,10 @@ under `data/synthetic/beacon_json/` and the checkpointed
 `scripts/evaluate_beacon_json.py` runner. Its frozen base-model result and LoRA
 decision gate are in the
 [2026-08-25 Beacon canonical JSON report](reports/BEACON_JSON_2026-08-25.md).
+The completed experiment rejects the tested LoRA: it compressed the prompt by
+79.3% but fell from 94.92% to 73.24% exact on the locked test and increased
+schema-invalid output to 5.08%. The full-prompt base model remains the selected
+condition.
 
 ## Fine-tuning baseline
 
