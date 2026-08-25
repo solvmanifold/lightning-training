@@ -59,6 +59,8 @@ python3 scripts/verify_data.py
 ```
 
 See the [data artifact notes](data/README.md) for provenance and layout.
+The [evaluation runbook](docs/EVALUATION_RUNBOOK.md) documents checkpointed
+execution, resumption, and the one-command GPU release procedure.
 
 ## Fine-tuning baseline
 
