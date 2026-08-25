@@ -27,14 +27,19 @@ TECHNOLOGIES = {
 }
 
 
-def beacon_context() -> tuple[str, tuple[str, ...], dict[str, object]]:
-    """Load the frozen prompt and example from the evaluator's source of truth."""
+def beacon_context() -> tuple[str, str, tuple[str, ...], list[dict[str, object]]]:
+    """Load the frozen prompts and examples from their sources of truth."""
     sys.path.insert(0, str(ROOT / "scripts"))
-    from evaluate_beacon_json import FINAL_FEWSHOT_CASE_IDS, FINAL_PROMPT  # noqa: PLC0415
+    from evaluate_beacon_json import (  # noqa: PLC0415
+        COMPACT_PROMPT,
+        FINAL_FEWSHOT_CASE_IDS,
+        FINAL_PROMPT,
+    )
 
     with (ROOT / "data/synthetic/beacon_json/train.jsonl").open() as handle:
-        example = json.loads(next(handle))
-    return FINAL_PROMPT, FINAL_FEWSHOT_CASE_IDS, example
+        training = {row["id"]: row for row in map(json.loads, handle)}
+    examples = [training[case_id] for case_id in FINAL_FEWSHOT_CASE_IDS]
+    return FINAL_PROMPT, COMPACT_PROMPT, FINAL_FEWSHOT_CASE_IDS, examples
 
 
 def revision() -> str:
@@ -96,7 +101,8 @@ def main() -> None:
 
     source_revision = revision()
     timestamp = built_at()
-    final_prompt, fewshot_ids, example = beacon_context()
+    final_prompt, compact_prompt, fewshot_ids, examples = beacon_context()
+    example = examples[0]
     data = {
         "project": {
             "name": "Nemotron Adaptation Lab",
@@ -124,6 +130,8 @@ def main() -> None:
         },
         "dataset": {
             "generator": "deterministic and LLM-free",
+            "generator_method": "Hand-authored split-specific phrase templates populated from case-index field values, with deterministic clause shuffling.",
+            "seed": 35003501,
             "train_cases": 2048,
             "development_cases": 256,
             "locked_test_cases": 512,
@@ -141,6 +149,22 @@ def main() -> None:
             "fewshot_case_ids": list(fewshot_ids),
             "mean_total_input_tokens": 1216,
             "response_format": "unconstrained JSON text with independent validation",
+        },
+        "fewshot_examples": [
+            {
+                "case_id": item["id"],
+                "input": item["messages"][0]["content"],
+                "output": item["expected"],
+            }
+            for item in examples
+        ],
+        "lora_prompt": {
+            "profile": "compact",
+            "system_prompt": compact_prompt,
+            "fewshot_case_ids": [],
+            "mean_total_input_tokens": 251.51171875,
+            "training_message_order": ["compact system prompt", "generated user request", "expected assistant JSON"],
+            "inference_message_order": ["compact system prompt", "unseen user request"],
         },
         "experiment_sequence": [
             {"name": "HellaSwag chat-MC", "purpose": "inference evaluation smoke", "cases": 10042, "result": "84.58% strict accuracy"},

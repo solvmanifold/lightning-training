@@ -19,6 +19,7 @@ ALLOWED_URLS = {
     "https://github.com/NVIDIA-NeMo/Automodel/blob/060cc495ac23350d4882f67ddf96ba663dd3696c/examples/llm_finetune/nemotron/nemotron_nano_v3_5_lightning_singlegpu_lora.yaml",
     "https://github.com/solvmanifold/lightning-training/blob/main/reports/BEACON_JSON_2026-08-25.md",
     "https://github.com/solvmanifold/lightning-training/blob/main/scripts/evaluate_beacon_json.py",
+    "https://github.com/solvmanifold/lightning-training/blob/main/scripts/generate_beacon_json.py",
 }
 FORBIDDEN = [
     re.compile(pattern, re.IGNORECASE)
@@ -113,13 +114,23 @@ def main() -> None:
     if "#main" not in checker.hrefs or "main" not in checker.ids:
         fail("keyboard skip link is missing")
     sys.path.insert(0, str(ROOT / "scripts"))
-    from evaluate_beacon_json import FINAL_FEWSHOT_CASE_IDS, FINAL_PROMPT  # noqa: PLC0415
+    from evaluate_beacon_json import (  # noqa: PLC0415
+        COMPACT_PROMPT,
+        FINAL_FEWSHOT_CASE_IDS,
+        FINAL_PROMPT,
+    )
     if data.get("winning_prompt", {}).get("system_prompt") != FINAL_PROMPT:
         fail("exported system prompt does not match the evaluator")
     if data.get("winning_prompt", {}).get("fewshot_case_ids") != list(FINAL_FEWSHOT_CASE_IDS):
         fail("exported few-shot IDs do not match the evaluator")
     if FINAL_PROMPT not in html:
         fail("exact frozen system prompt is missing from the HTML")
+    if data.get("lora_prompt", {}).get("system_prompt") != COMPACT_PROMPT:
+        fail("exported LoRA prompt does not match the evaluator")
+    if COMPACT_PROMPT not in html:
+        fail("exact LoRA system prompt is missing from the HTML")
+    if len(data.get("fewshot_examples", [])) != 4:
+        fail("export must contain the four complete few-shot examples")
     print("brief export validation ok")
 
 

@@ -43,9 +43,16 @@
 
     <section class="section example" id="example">
       <div class="section-head"><div><p class="eyebrow">Concrete task</p><h2>Language in.<br>Canonical job out.</h2></div><p>Beacon is a deterministic compiler task. A request can contain aliases, defaults, corrections, and operational qualifiers; the model must resolve all of them into exactly ten fields.</p></div>
+      <div class="message-stack" aria-label="Final in-context learning message sequence">
+        <div><span>1</span><p class="eyebrow">System</p><b>Rules and output contract</b><small>The exact prompt shown below</small></div>
+        <div class="stack-shots"><span>2</span><p class="eyebrow">Four demonstrations</p><b>User → assistant pairs</b><small>Complete canonical JSON examples</small></div>
+        <div><span>3</span><p class="eyebrow">User</p><b>New request to compile</b><small>No answer or retrieval context</small></div>
+      </div>
+      <p class="stack-caption">Every evaluated request received this complete message stack. The four demonstrations were part of the input context—not part of the system prompt and not weight updates.</p>
+      <div class="subhead"><p class="eyebrow">Demonstration 1 of 4 · shown in full</p><h3>The hardest example teaches corrections and interacting fields.</h3></div>
       <div class="io-grid">
-        <article class="terminal input-terminal"><div class="terminal-head"><span>Input · training example 00000</span><span>User</span></div><p>Copy <mark>res_tr_00000</mark> over to <mark>us-north</mark>. Preview it only; do not apply changes. Correction: use <mark>14 retention days</mark>, not 19. Actually, final urgency is <mark>low</mark>, not high. Treat the resource as regulated and use <mark>strict encryption</mark>. This can wait. Compress the stored data.</p></article>
-        <article class="terminal output-terminal"><div class="terminal-head"><span>Expected output</span><span>Assistant</span></div><pre><code>{
+        <article class="terminal input-terminal"><div class="terminal-head"><span>beacon-train-00000</span><span>User message</span></div><p>Copy <mark>res_tr_00000</mark> over to <mark>us-north</mark>. Preview it only; do not apply changes. Correction: use <mark>14 retention days</mark>, not 19. Actually, final urgency is <mark>low</mark>, not high. Treat the resource as regulated and use <mark>strict encryption</mark>. This can wait. Compress the stored data.</p></article>
+        <article class="terminal output-terminal"><div class="terminal-head"><span>beacon-train-00000</span><span>Assistant message</span></div><pre><code>{
   "action": "replicate",
   "compression": true,
   "encryption": "strict",
@@ -58,6 +65,28 @@
   "urgency": "low"
 }</code></pre></article>
       </div>
+      <div class="subhead"><p class="eyebrow">The complete 4-shot set</p><h3>Each pair demonstrates a different part of the contract.</h3><p>These cards summarize the JSON for readability; the model received the complete ten-field object shown above for every shot.</p></div>
+      <div class="shots-grid">
+        <article><div class="shot-head"><span>01</span><b>Replicate + corrections</b></div><p>“Copy … Preview it only … final urgency is low … regulated …”</p><ul><li>replicate → us-north</li><li>plan · strict · low</li><li>14 days · compressed</li></ul></article>
+        <article><div class="shot-head"><span>02</span><b>Snapshot defaults</b></div><p>“Back up res_tr_00001. This can wait … regulated …”</p><ul><li>snapshot → null region</li><li>apply · strict · low</li><li>14 days · notification</li></ul></article>
+        <article><div class="shot-head"><span>03</span><b>Minimal replicate</b></div><p>“Copy res_tr_00004 over to us-south. Notify …”</p><ul><li>replicate → us-south</li><li>apply · standard · normal</li><li>14-day default · compressed</li></ul></article>
+        <article><div class="shot-head"><span>04</span><b>Retire semantics</b></div><p>“Decommission res_tr_00007 … Finish it today …”</p><ul><li>retire → null region</li><li>apply · strict · high</li><li>92 days · uncompressed</li></ul></article>
+      </div>
+      <aside class="generator-note">
+        <div><p class="eyebrow">Where did the prose come from?</p><h3>Python templates, not an LLM.</h3></div>
+        <div><p>The generator deterministically chooses an action and field values from the case index, renders them with hand-authored split-specific phrases, adds optional clauses and corrections, then shuffles clause order with seed <code>35,003,501</code>. The expected JSON is built directly from the same variables.</p><div class="generator-flow" aria-label="Dataset generation sequence"><span>Case index</span><i>→</i><span>Field values</span><i>→</i><span>Phrase templates</span><i>→</i><span>Seeded shuffle</span><i>→</i><span>JSON oracle</span></div><a class="text-link" href="https://github.com/solvmanifold/lightning-training/blob/main/scripts/generate_beacon_json.py">Inspect the deterministic generator ↗</a></div>
+      </aside>
+      <div class="condition-head"><p class="eyebrow">The actual comparison</p><h3>Context in the prompt versus behavior in the weights.</h3></div>
+      <div class="condition-grid">
+        <article class="condition base-condition"><div class="condition-title"><span>Base model</span><strong>1,214.5</strong><small>mean input tokens</small></div><ol><li><b>System</b><span>Full rules + disambiguation</span></li><li><b>4× user → assistant</b><span>Complete training demonstrations</span></li><li><b>User</b><span>New request</span></li></ol><p>Result: <strong>94.92%</strong> locked-test exact</p></article>
+        <article class="condition lora-condition"><div class="condition-title"><span>LoRA adapter</span><strong>251.5</strong><small>mean input tokens</small></div><ol><li><b>System</b><span>Compact rules below</span></li><li class="omitted"><b>No demonstrations</b><span>Behavior was expected in the weights</span></li><li><b>User</b><span>New request</span></li></ol><p>Result: <strong>73.24%</strong> locked-test exact</p></article>
+      </div>
+      <details class="prompt-details compact-details">
+        <summary><span>Read the exact LoRA inference prompt</span><small>Compact profile · no few-shot examples</small></summary>
+        <pre><code>Compile the request into one Beacon JSON object and output JSON only. Use exactly these fields: schema_version, action, resource_id, target_region, urgency, execution, encryption, retention_days, compression, notify.
+
+schema_version is `beacon-job-v1`. action is replicate, snapshot, restore, or retire. target_region is one of us-north, us-south, eu-central, ap-east, and is null for snapshot or retire. urgency defaults to normal. execution defaults to apply; previews and dry runs are plan. encryption defaults to standard; sensitive or regulated data is strict. retention defaults are replicate=14, snapshot=30, restore=7, retire=90 days. Weeks are seven days. compression defaults true for replicate/snapshot and false for restore/retire. notify defaults to an empty array and addresses must be sorted. Explicit instructions and final corrections override defaults.</code></pre>
+      </details>
       <div class="prompt-intro"><div><p class="eyebrow">Winning condition</p><h3>A manual, explicit system prompt—plus four fixed training examples.</h3></div><p>The prompt names the output contract, maps language to actions, states every default, and handles the errors seen during development: plans versus applied snapshots, urgency boundaries, encryption independence, and final corrections. No JSON grammar was used in the selected condition.</p></div>
       <details class="prompt-details">
         <summary><span>Read the exact frozen system prompt</span><small>Final condition · 1,216 mean input tokens including four examples</small></summary>
