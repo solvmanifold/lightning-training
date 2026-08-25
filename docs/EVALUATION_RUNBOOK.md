@@ -45,3 +45,14 @@ in-flight, uncheckpointed case is retried on resume.
 
 Evaluation output is ignored by Git until a completed result is deliberately
 promoted into a versioned report.
+
+## Run the Atlas development baseline
+
+The compact-prompt condition runs against development data only:
+
+```bash
+python3 scripts/evaluate_atlas.py --run-id compact-development-01
+```
+
+The same release script discovers both HellaSwag and Atlas evaluators. Keep the
+locked Atlas test split untouched until the prompt conditions are frozen.
