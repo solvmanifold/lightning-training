@@ -98,6 +98,17 @@ docker compose run --rm trainer
 Checkpoints are written to `outputs/checkpoints/`. Hugging Face downloads are
 cached in the host's standard cache directory.
 
+Run the trainer as a named container so it can be paused safely:
+
+```bash
+docker compose run -d --name lightning-training-baseline trainer
+./scripts/pause_training.sh lightning-training-baseline
+```
+
+The pause command sends SIGTERM and lets NeMo AutoModel finish the current
+optimizer step and checkpoint; it never escalates to SIGKILL. AutoModel
+restores the latest compatible checkpoint when the trainer is started again.
+
 Before any LoRA run, we must also prove that its adapter can be served through
 a practical Spark deployment path and evaluated under conditions comparable to
 the current NVFP4 baseline. DPO, GRPO, and QLoRA remain out of scope.
