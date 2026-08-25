@@ -67,7 +67,9 @@ The first decision-relevant workload result is the
 [2026-08-25 Atlas tool-routing smoke report](reports/ATLAS_SMOKE_2026-08-25.md).
 The deterministic canonical-JSON experiment uses the generated Beacon dataset
 under `data/synthetic/beacon_json/` and the checkpointed
-`scripts/evaluate_beacon_json.py` runner.
+`scripts/evaluate_beacon_json.py` runner. Its frozen base-model result and LoRA
+decision gate are in the
+[2026-08-25 Beacon canonical JSON report](reports/BEACON_JSON_2026-08-25.md).
 
 ## Fine-tuning baseline
 

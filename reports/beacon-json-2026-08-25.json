@@ -1,0 +1,45 @@
+{
+  "dataset": {
+    "development_cases": 256,
+    "test_cases": 512,
+    "test_sha256": "3b7f8129eb9f4b9c6779f6f0ea3e2c200ee97688d956677dd9e7e379c9f2ee9a",
+    "train_cases": 2048,
+    "version": "beacon-job-v1"
+  },
+  "development": {
+    "exact": 252,
+    "exact_rate": 0.984375,
+    "field_precision": 0.9984375,
+    "field_recall": 0.9984375,
+    "json_parse_rate": 1.0,
+    "mean_latency_seconds": 1.1276964768658218,
+    "mean_prompt_tokens": 1215.7421875,
+    "schema_valid_rate": 1.0,
+    "total": 256
+  },
+  "failure_fields": {
+    "compression": 23,
+    "notify": 1,
+    "urgency": 2
+  },
+  "model": "nvidia/nemotron-3.5-lightning",
+  "prompt_profile": "final",
+  "recommendation": "run_lora_behavioral_compression_experiment",
+  "test": {
+    "exact": 486,
+    "exact_rate": 0.94921875,
+    "field_precision": 0.994921875,
+    "field_recall": 0.994921875,
+    "json_parse_rate": 1.0,
+    "latency_p50_seconds": 1.1360334940254688,
+    "latency_p95_seconds": 1.2526792739517987,
+    "mean_completion_tokens": 73.912109375,
+    "mean_latency_seconds": 1.1366924148101134,
+    "mean_prompt_tokens": 1214.51171875,
+    "schema_valid_rate": 1.0,
+    "total": 512,
+    "wilson_95_high": 0.9651,
+    "wilson_95_low": 0.9266
+  }
+}
+
