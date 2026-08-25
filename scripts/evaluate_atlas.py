@@ -46,7 +46,8 @@ Stable routing manual:
 - A containment or quarantine request naming both an account and credential requires `suspend_account` followed by `revoke_credential`.
 
 Use only exact identifiers from State. Never invent an argument, silently select among ambiguous entities, omit a requested action, or substitute a nearby tool."""
-PROMPTS = {"compact": COMPACT_PROMPT, "manual": MANUAL_PROMPT}
+PROMPTS = {"compact": COMPACT_PROMPT, "manual": MANUAL_PROMPT, "fewshot": MANUAL_PROMPT}
+FEWSHOT_CASE_IDS = ("atlas-train-0006", "atlas-train-0007")
 STOP_REQUESTED = False
 
 
@@ -141,6 +142,23 @@ def exact_workflow(predicted: dict[str, Any], expected: dict[str, Any]) -> bool:
     return True
 
 
+def fewshot_messages(root: Path) -> list[dict[str, Any]]:
+    training_path = root / "data/synthetic/atlas_smoke/train.jsonl"
+    training = {row["id"]: row for row in load_jsonl(training_path)}
+    messages: list[dict[str, Any]] = []
+    for case_id in FEWSHOT_CASE_IDS:
+        case = training[case_id]
+        decision = case["expected"]["decision"]
+        if decision == "clarify":
+            content = "CLARIFY: " + ", ".join(case["expected"]["required_fields"])
+        elif decision == "no_action":
+            content = "NO_ACTION"
+        else:
+            raise RuntimeError(f"unsupported textual few-shot decision: {decision}")
+        messages.extend([*case["messages"], {"role": "assistant", "content": content}])
+    return messages
+
+
 def append_jsonl(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
@@ -209,6 +227,7 @@ def main() -> int:
     cases = load_jsonl(dataset)
     catalog = json.loads(catalog_path.read_text())
     system_prompt = PROMPTS[args.prompt_profile]
+    examples = fewshot_messages(root) if args.prompt_profile == "fewshot" else []
     if any(case["tool_catalog"] != catalog["id"] for case in cases):
         raise RuntimeError("case tool-catalog ID does not match loaded catalog")
     if args.validate_only:
@@ -237,6 +256,7 @@ def main() -> int:
                 "config": config,
                 "dataset_sha256": sha256(dataset),
                 "prompt_profile": args.prompt_profile,
+                "fewshot_case_ids": FEWSHOT_CASE_IDS if examples else (),
                 "system_prompt": system_prompt,
                 "tool_catalog_sha256": sha256(catalog_path),
             },
@@ -257,6 +277,7 @@ def main() -> int:
             "evaluation_git_dirty": bool(git_value(root, ["status", "--porcelain"])),
             "evaluation_git_revision": git_value(root, ["rev-parse", "HEAD"]),
             "evaluator_sha256": sha256(Path(__file__).resolve()),
+            "fewshot_case_ids": FEWSHOT_CASE_IDS if examples else (),
             "model_config": config,
             "models_response": get_json(models_url),
             "run_id": args.run_id,
@@ -283,7 +304,11 @@ def main() -> int:
                 continue
             payload = {
                 **config,
-                "messages": [{"role": "system", "content": system_prompt}, *case["messages"]],
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    *examples,
+                    *case["messages"],
+                ],
                 "tools": catalog["tools"],
             }
             response = None
