@@ -1,9 +1,13 @@
-# Evaluate and adapt Nemotron 3.5 Lightning on DGX Spark
+# Nemotron Adaptation Lab
 
-This repository determines whether Nemotron 3.5 Lightning needs fine-tuning for
+An evaluation-first lab for adapting NVIDIA Nemotron models on DGX Spark.
+
+The first study determines whether Nemotron 3.5 Lightning needs fine-tuning for
 our workloads. The default adaptation order is prompting, constrained output,
 tooling, and RAG. Fine-tuning is considered only after evaluation shows a
-stable residual gap that those cheaper interventions do not solve.
+stable residual gap that those cheaper interventions do not solve. Future
+Nemotron model studies can reuse the same harnesses, decision gates, and
+deployment checks in this repository.
 
 Local inference already lives in `~/Dev/spark-inference`. Its verified NVIDIA
 NIM serves the deployable NVFP4 checkpoint at

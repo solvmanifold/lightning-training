@@ -1,5 +1,6 @@
 # Spark dashboard handoff
 
+- Display name: **Nemotron Adaptation Lab**
 - Project key: `lightning-training`
 - Export directory: `brief/dist/`
 - Entrypoint: `index.html`
