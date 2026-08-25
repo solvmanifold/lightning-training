@@ -132,3 +132,15 @@ AutoModel checkpoints every 64 optimizer steps and restores the latest
 compatible checkpoint when the same command is launched again. Train and
 checkpoint selection use only the training and development splits; the locked
 test is opened once after the candidate and configuration are frozen.
+
+Serve a completed checkpoint with the verified eager-mode LoRA profile:
+
+```bash
+./scripts/serve_lora_nim.sh \
+  outputs/checkpoints/beacon-lora-seed1111/epoch_0_step_255/model \
+  beacon-seed1111-step255
+```
+
+The launcher uses the shared offline NIM cache, exposes port 8012 by default,
+and refuses to replace an existing container. Stop its exact container with
+`docker rm -f lightning-lora-eval` after evaluation.
