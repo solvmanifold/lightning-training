@@ -61,6 +61,8 @@ python3 scripts/verify_data.py
 See the [data artifact notes](data/README.md) for provenance and layout.
 The [evaluation runbook](docs/EVALUATION_RUNBOOK.md) documents checkpointed
 execution, resumption, and the one-command GPU release procedure.
+The first completed result is the
+[2026-08-25 HellaSwag chat-MC report](reports/HELLASWAG_CHAT_MC_2026-08-25.md).
 
 ## Fine-tuning baseline
 

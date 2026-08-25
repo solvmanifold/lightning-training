@@ -1,0 +1,38 @@
+{
+  "accuracy": 0.8458474407488548,
+  "by_split_type": {
+    "indomain": {
+      "accuracy": 0.8396320735852829,
+      "correct": 4199,
+      "total": 5001
+    },
+    "zeroshot": {
+      "accuracy": 0.8520134893870264,
+      "correct": 4295,
+      "total": 5041
+    }
+  },
+  "correct": 8494,
+  "dataset_sha256": "961fe851e978e4fcde703bf1fa8c44a770a8a6b7b4297a641a4dc197c23205f0",
+  "errors": 0,
+  "evaluation_git_revision": "e77533c40c270f241552ba091d63ea643f63d72c",
+  "evaluator_sha256": "22afc2c7c10563c40be5ae5e7c22a0cd09dd07041bfbb47d57cf5a679eddfdcb",
+  "invalid_labels": 0,
+  "latency_s": {
+    "mean": 0.11331724219598584,
+    "median": 0.1164683434762992,
+    "p95": 0.1241348379990086,
+    "sum": 1137.9317461320898
+  },
+  "model": "nvidia/nemotron-3.5-lightning",
+  "protocol": "hellaswag-chat-mc",
+  "run_id": "validation-full-01",
+  "run_signature": "967ccd5a5b996f2e67eb9834b18c21c4d6dd45c556807d5361a5d57003292c78",
+  "smoke_prefix_prediction_agreement": 1.0,
+  "total": 10042,
+  "valid_label_rate": 1.0,
+  "wilson_95": [
+    0.8386527884173044,
+    0.8527775938431187
+  ]
+}
