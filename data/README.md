@@ -5,6 +5,7 @@ Run the CPU-only preparation commands from the repository root:
 ```bash
 python3 scripts/prepare_hellaswag.py
 python3 scripts/generate_atlas_smoke.py
+python3 scripts/generate_beacon_json.py
 python3 scripts/verify_data.py
 ```
 
@@ -21,6 +22,11 @@ derives both requests and oracle tool calls from deterministic latent cases.
 The smoke split is intentionally small; it validates formats and scoring before
 we build the full experiment dataset described in
 [`docs/BEHAVIORAL_COMPRESSION_EXPERIMENT.md`](../docs/BEHAVIORAL_COMPRESSION_EXPERIMENT.md).
+
+`generate_beacon_json.py` builds the separate canonical-JSON experiment from
+latent job specifications. It commits 2,048 training, 256 development, and 512
+locked-test cases with disjoint surface-template families. Labels and defaults
+are derived mechanically; no language model participates in generation.
 
 Generated manifests contain counts and file hashes. `verify_data.py` checks the
 committed artifacts without downloading anything.

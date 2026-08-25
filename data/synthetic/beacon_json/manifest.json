@@ -1,0 +1,29 @@
+{
+  "artifacts": {
+    "development": {
+      "path": "data/synthetic/beacon_json/development.jsonl",
+      "rows": 256,
+      "sha256": "7da2a9154b8f232f6e17653f8481d4ac7600069366a0b298f57ebd658d11c65a"
+    },
+    "test": {
+      "path": "data/synthetic/beacon_json/test.jsonl",
+      "rows": 512,
+      "sha256": "3b7f8129eb9f4b9c6779f6f0ea3e2c200ee97688d956677dd9e7e379c9f2ee9a"
+    },
+    "train": {
+      "path": "data/synthetic/beacon_json/train.jsonl",
+      "rows": 2048,
+      "sha256": "5904b74490fca8b1d032f0c20fecf3767f9f06935768cadd973bdcafcac04075"
+    }
+  },
+  "generator": {
+    "path": "scripts/generate_beacon_json.py",
+    "sha256": "67d535b4f529002de15fec1610fcede6b340be65e84f81c7cf3c9151d1cb15d9"
+  },
+  "schema": {
+    "path": "data/synthetic/beacon_json/schema.json",
+    "sha256": "d8b66d246048192f47924e28ab57c96d9add8c179a99926c6266dfc5795d90d2"
+  },
+  "seed": 35003501,
+  "version": "beacon-job-v1"
+}

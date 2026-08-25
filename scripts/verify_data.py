@@ -7,6 +7,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from beacon_schema import validate_beacon
+
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -87,10 +89,34 @@ def main() -> None:
                 if "enum" in property_schema and value not in property_schema["enum"]:
                     raise RuntimeError(f"{row['id']}: invalid {name}.{key} value {value}")
 
+    beacon_manifest = json.loads((root / "data/synthetic/beacon_json/manifest.json").read_text())
+    beacon_generator = beacon_manifest["generator"]
+    if sha256(root / beacon_generator["path"]) != beacon_generator["sha256"]:
+        raise RuntimeError("Beacon generator SHA-256 mismatch; regenerate its artifacts")
+    beacon_schema = root / beacon_manifest["schema"]["path"]
+    if sha256(beacon_schema) != beacon_manifest["schema"]["sha256"]:
+        raise RuntimeError("Beacon schema SHA-256 mismatch")
+    beacon: list[dict[str, object]] = []
+    beacon_prompts: set[str] = set()
+    for artifact in beacon_manifest["artifacts"].values():
+        rows = verify_artifact(root, artifact)
+        beacon.extend(rows)
+        for row in rows:
+            errors = validate_beacon(row["expected"])
+            if errors:
+                raise RuntimeError(f"{row['id']}: invalid Beacon oracle: {errors}")
+            prompt = row["messages"][0]["content"]
+            if prompt in beacon_prompts:
+                raise RuntimeError(f"{row['id']}: duplicate Beacon prompt")
+            beacon_prompts.add(prompt)
+    if len({row["id"] for row in beacon}) != len(beacon):
+        raise RuntimeError("duplicate Beacon case ID")
+
     print(f"verified {len(hellaswag)} HellaSwag smoke cases")
     if full_path.exists():
         print(f"verified {len(full_hellaswag)} full HellaSwag cases")
     print(f"verified {len(atlas)} Atlas smoke cases")
+    print(f"verified {len(beacon)} Beacon canonical-JSON cases")
 
 
 if __name__ == "__main__":

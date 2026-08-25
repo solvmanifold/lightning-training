@@ -65,6 +65,9 @@ The first completed result is the
 [2026-08-25 HellaSwag chat-MC report](reports/HELLASWAG_CHAT_MC_2026-08-25.md).
 The first decision-relevant workload result is the
 [2026-08-25 Atlas tool-routing smoke report](reports/ATLAS_SMOKE_2026-08-25.md).
+The deterministic canonical-JSON experiment uses the generated Beacon dataset
+under `data/synthetic/beacon_json/` and the checkpointed
+`scripts/evaluate_beacon_json.py` runner.
 
 ## Fine-tuning baseline
 

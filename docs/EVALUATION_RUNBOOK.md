@@ -84,3 +84,19 @@ python3 scripts/evaluate_atlas.py \
 
 The same release script discovers both HellaSwag and Atlas evaluators. Keep the
 locked Atlas test split untouched until the prompt conditions are frozen.
+
+## Run the Beacon canonical-JSON ladder
+
+Validate data without the GPU, then run development conditions with distinct
+run IDs:
+
+```bash
+python3 scripts/evaluate_beacon_json.py --validate-only
+python3 scripts/evaluate_beacon_json.py --prompt-profile compact --run-id compact-development-01
+python3 scripts/evaluate_beacon_json.py --prompt-profile manual --run-id manual-development-01
+python3 scripts/evaluate_beacon_json.py --prompt-profile fewshot --run-id fewshot-development-01
+python3 scripts/evaluate_beacon_json.py --prompt-profile constrained --run-id constrained-development-01
+```
+
+Use `--limit 64` for a resumable smoke run. Do not point the evaluator at
+`test.jsonl` until a development condition is frozen.

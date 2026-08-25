@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "enum": [
+        "replicate",
+        "snapshot",
+        "restore",
+        "retire"
+      ]
+    },
+    "compression": {
+      "type": "boolean"
+    },
+    "encryption": {
+      "enum": [
+        "standard",
+        "strict"
+      ]
+    },
+    "execution": {
+      "enum": [
+        "plan",
+        "apply"
+      ]
+    },
+    "notify": {
+      "items": {
+        "pattern": "^[a-z0-9-]+@example\\.invalid$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "resource_id": {
+      "pattern": "^res_[a-z]{2}_[0-9]{5}$",
+      "type": "string"
+    },
+    "retention_days": {
+      "maximum": 365,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "beacon-job-v1"
+    },
+    "target_region": {
+      "enum": [
+        "us-north",
+        "us-south",
+        "eu-central",
+        "ap-east",
+        null
+      ],
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "urgency": {
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "critical"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "action",
+    "resource_id",
+    "target_region",
+    "urgency",
+    "execution",
+    "encryption",
+    "retention_days",
+    "compression",
+    "notify"
+  ],
+  "title": "Beacon job",
+  "type": "object"
+}
