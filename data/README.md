@@ -12,6 +12,9 @@ python3 scripts/verify_data.py
 split to the ignored `data/raw/` directory, verifies its SHA-256 digest, and
 rebuilds the committed 100-case chat-MC smoke artifact. It also creates the
 ignored, reproducible full evaluation artifact under `data/derived/`.
+The upstream `ind` field is not globally unique; later occurrences receive a
+deterministic `-dupN` case-ID suffix while retaining the original index in
+metadata.
 
 `generate_atlas_smoke.py` requires no network access and no language model. It
 derives both requests and oracle tool calls from deterministic latent cases.

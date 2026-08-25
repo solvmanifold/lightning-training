@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import hashlib
 import json
 import os
@@ -68,10 +69,12 @@ def prompt(row: dict[str, object]) -> str:
     return f"Context: {row['ctx']}\n\nContinuations:\n{choices}\n\nAnswer:"
 
 
-def normalize(source: dict[str, object]) -> dict[str, object]:
+def normalize(source: dict[str, object], source_ind_occurrence: int) -> dict[str, object]:
     label_index = int(source["label"])
+    source_ind = int(source["ind"])
+    duplicate_suffix = "" if source_ind_occurrence == 1 else f"-dup{source_ind_occurrence}"
     return {
-        "id": f"hellaswag-val-{int(source['ind']):05d}",
+        "id": f"hellaswag-val-{source_ind:05d}{duplicate_suffix}",
         "suite": "hellaswag-chat-mc",
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -107,12 +110,18 @@ def prepare(repo_root: Path) -> None:
     download(source_path)
 
     rows: list[dict[str, object]] = []
+    source_ind_counts: Counter[int] = Counter()
     with source_path.open(encoding="utf-8") as handle:
         for line in handle:
-            rows.append(normalize(json.loads(line)))
+            source = json.loads(line)
+            source_ind = int(source["ind"])
+            source_ind_counts[source_ind] += 1
+            rows.append(normalize(source, source_ind_counts[source_ind]))
 
     if len(rows) != SOURCE_ROWS:
         raise RuntimeError(f"expected {SOURCE_ROWS} source rows, got {len(rows)}")
+    if len({row["id"] for row in rows}) != len(rows):
+        raise RuntimeError("normalized HellaSwag case IDs are not unique")
 
     write_jsonl(smoke_path, rows[:SMOKE_ROWS])
     write_jsonl(full_path, rows)

@@ -7,11 +7,11 @@
   "full_artifact": {
     "path": "data/derived/hellaswag/chat_mc_validation_10042.jsonl",
     "rows": 10042,
-    "sha256": "79646f411169fd603d20c95bf49765c863b571c2bb5bcbf5defb51113083a995"
+    "sha256": "961fe851e978e4fcde703bf1fa8c44a770a8a6b7b4297a641a4dc197c23205f0"
   },
   "generator": {
     "path": "scripts/prepare_hellaswag.py",
-    "sha256": "a20ac568c55df4a9ed924a6f8ab4b0d6092e572a9cfe748bd53b94acc1f22e37"
+    "sha256": "4db740559df778599d9e5478ac22b1f74a821b6396811d8656f959fe296f5dd2"
   },
   "prompt_sha256": "e259243e6022fdd1dcaf6ff9a6b79d5c68857ff2fbc55e0cbc06521395efe6a5",
   "protocol": "hellaswag-chat-mc",
