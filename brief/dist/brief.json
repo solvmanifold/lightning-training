@@ -28,6 +28,8 @@
   },
   "dataset": {
     "generator": "deterministic and LLM-free",
+    "generator_method": "Hand-authored split-specific phrase templates populated from case-index field values, with deterministic clause shuffling.",
+    "seed": 35003501,
     "train_cases": 2048,
     "development_cases": 256,
     "locked_test_cases": 512,
@@ -61,6 +63,93 @@
     ],
     "mean_total_input_tokens": 1216,
     "response_format": "unconstrained JSON text with independent validation"
+  },
+  "fewshot_examples": [
+    {
+      "case_id": "beacon-train-00000",
+      "input": "Copy res_tr_00000 over to us-north. Preview it only; do not apply changes. Correction: use 14 retention days, not 19. Actually, final urgency is low, not high. Treat the resource as regulated and use strict encryption. This can wait. Compress the stored data.",
+      "output": {
+        "action": "replicate",
+        "compression": true,
+        "encryption": "strict",
+        "execution": "plan",
+        "notify": [],
+        "resource_id": "res_tr_00000",
+        "retention_days": 14,
+        "schema_version": "beacon-job-v1",
+        "target_region": "us-north",
+        "urgency": "low"
+      }
+    },
+    {
+      "case_id": "beacon-train-00001",
+      "input": "Back up res_tr_00001. This can wait. Notify team-01@example.invalid. Keep the result for 14 days. Treat the resource as regulated and use strict encryption.",
+      "output": {
+        "action": "snapshot",
+        "compression": true,
+        "encryption": "strict",
+        "execution": "apply",
+        "notify": [
+          "team-01@example.invalid"
+        ],
+        "resource_id": "res_tr_00001",
+        "retention_days": 14,
+        "schema_version": "beacon-job-v1",
+        "target_region": null,
+        "urgency": "low"
+      }
+    },
+    {
+      "case_id": "beacon-train-00004",
+      "input": "Copy res_tr_00004 over to us-south. Notify team-04@example.invalid.",
+      "output": {
+        "action": "replicate",
+        "compression": true,
+        "encryption": "standard",
+        "execution": "apply",
+        "notify": [
+          "team-04@example.invalid"
+        ],
+        "resource_id": "res_tr_00004",
+        "retention_days": 14,
+        "schema_version": "beacon-job-v1",
+        "target_region": "us-south",
+        "urgency": "normal"
+      }
+    },
+    {
+      "case_id": "beacon-train-00007",
+      "input": "Decommission res_tr_00007. Treat the resource as regulated and use strict encryption. Keep the result for 92 days. Finish it today. Notify team-07@example.invalid.",
+      "output": {
+        "action": "retire",
+        "compression": false,
+        "encryption": "strict",
+        "execution": "apply",
+        "notify": [
+          "team-07@example.invalid"
+        ],
+        "resource_id": "res_tr_00007",
+        "retention_days": 92,
+        "schema_version": "beacon-job-v1",
+        "target_region": null,
+        "urgency": "high"
+      }
+    }
+  ],
+  "lora_prompt": {
+    "profile": "compact",
+    "system_prompt": "Compile the request into one Beacon JSON object and output JSON only. Use exactly these fields: schema_version, action, resource_id, target_region, urgency, execution, encryption, retention_days, compression, notify.\n\nschema_version is `beacon-job-v1`. action is replicate, snapshot, restore, or retire. target_region is one of us-north, us-south, eu-central, ap-east, and is null for snapshot or retire. urgency defaults to normal. execution defaults to apply; previews and dry runs are plan. encryption defaults to standard; sensitive or regulated data is strict. retention defaults are replicate=14, snapshot=30, restore=7, retire=90 days. Weeks are seven days. compression defaults true for replicate/snapshot and false for restore/retire. notify defaults to an empty array and addresses must be sorted. Explicit instructions and final corrections override defaults.",
+    "fewshot_case_ids": [],
+    "mean_total_input_tokens": 251.51171875,
+    "training_message_order": [
+      "compact system prompt",
+      "generated user request",
+      "expected assistant JSON"
+    ],
+    "inference_message_order": [
+      "compact system prompt",
+      "unseen user request"
+    ]
   },
   "experiment_sequence": [
     {
@@ -129,8 +218,8 @@
   },
   "measurement": {
     "date": "2026-08-25",
-    "built_at": "2026-08-25T22:32:49Z",
-    "source_revision": "6fb863e0eb9ee6a099b657a3fccc92155526ee94",
+    "built_at": "2026-08-25T22:48:52Z",
+    "source_revision": "e8d720d204db020440deb0b253461e25b48fb128",
     "protocol": "Deterministic Beacon JSON generation; development-only prompt and checkpoint selection; one paired opening of the locked test.",
     "limitations": [
       "Prompt-ladder scores use development cases and are not independent test estimates.",

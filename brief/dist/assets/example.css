@@ -123,9 +123,98 @@
 .experiment-verdict.pass { border-color: #739900; }
 .experiment-verdict.fail { border-color: var(--ember); }
 
+.message-stack {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr 1fr;
+  gap: 3px;
+}
+
+.message-stack > div {
+  position: relative;
+  min-height: 150px;
+  padding: 1.3rem;
+  background: #20272a;
+}
+
+.message-stack > div > span {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #586163;
+  font: 400 2.2rem var(--serif);
+}
+
+.message-stack .eyebrow { margin-bottom: 1.5rem; }
+.message-stack b,
+.message-stack small { display: block; }
+.message-stack b { font: 400 1.35rem var(--serif); }
+.message-stack small { margin-top: .35rem; color: #8f9694; font-size: .72rem; }
+.message-stack .stack-shots { background: var(--acid); color: var(--ink); }
+.message-stack .stack-shots .eyebrow,
+.message-stack .stack-shots small { color: #48531d; }
+.stack-caption { max-width: 760px; margin: 1rem 0 4rem; color: #a3aaa7; font-size: .82rem; }
+.subhead { max-width: 840px; margin: 0 0 1.5rem; }
+.subhead h3 { margin-bottom: .7rem; }
+.subhead > p:last-child { color: #a3aaa7; }
+
+.shots-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  margin-bottom: 4rem;
+}
+
+.shots-grid article { padding: 1.3rem; background: #1a2124; }
+.shot-head { display: flex; gap: .7rem; align-items: baseline; }
+.shot-head span { color: var(--cyan); font: 700 .65rem var(--mono); }
+.shot-head b { font: 400 1.15rem var(--serif); }
+.shots-grid p { min-height: 6.8rem; color: #aab0ae; font-size: .82rem; }
+.shots-grid ul { margin: 1rem 0 0; padding: 1rem 0 0; border-top: 1px solid var(--line); list-style: none; }
+.shots-grid li { margin: .35rem 0; color: #d3d7d4; font: 600 .68rem var(--mono); }
+
+.generator-note {
+  display: grid;
+  grid-template-columns: .7fr 1.3fr;
+  gap: 4rem;
+  margin: 0 0 5rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid #405154;
+  background: #132226;
+}
+
+.generator-note h3 { margin-bottom: 0; }
+.generator-note > div > p:not(.eyebrow) { color: #b7bfbc; }
+.generator-note code { color: var(--acid); font-family: var(--mono); }
+.generator-flow { display: flex; gap: .55rem; align-items: center; flex-wrap: wrap; margin: 1.5rem 0; }
+.generator-flow span { padding: .45rem .6rem; border: 1px solid #526064; font: 600 .65rem var(--mono); }
+.generator-flow i { color: var(--cyan); font-style: normal; }
+
+.condition-head { max-width: 800px; margin-bottom: 1.5rem; }
+.condition-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.condition { padding: clamp(1.3rem, 3vw, 2.2rem); border: 1px solid var(--line); background: #171d20; }
+.base-condition { border-top: 6px solid var(--acid); }
+.lora-condition { border-top: 6px solid var(--ember); }
+.condition-title { display: grid; grid-template-columns: 1fr auto; align-items: end; padding-bottom: 1.2rem; border-bottom: 1px solid var(--line); }
+.condition-title > span { font: 400 1.5rem var(--serif); }
+.condition-title strong { grid-row: 1 / 3; grid-column: 2; font: 400 2.8rem var(--serif); }
+.condition-title small { color: #8f9694; }
+.condition ol { padding: 0; list-style: none; }
+.condition li { display: flex; justify-content: space-between; gap: 1rem; padding: .65rem 0; border-bottom: 1px solid var(--line); font-size: .78rem; }
+.condition li span { color: #929a97; text-align: right; }
+.condition li.omitted { color: #858c8a; text-decoration: line-through; }
+.condition > p { margin: 1.5rem 0 0; }
+.base-condition > p strong { color: var(--acid); }
+.lora-condition > p strong { color: var(--ember); }
+.compact-details { margin: 1.2rem 0 5rem; }
+
 @media (max-width: 800px) {
   .io-grid,
-  .prompt-intro { grid-template-columns: 1fr; }
+  .prompt-intro,
+  .generator-note,
+  .condition-grid { grid-template-columns: 1fr; }
+  .message-stack { grid-template-columns: 1fr; }
+  .shots-grid { grid-template-columns: 1fr 1fr; }
+  .shots-grid p { min-height: 0; }
   .prompt-intro { gap: 1rem; }
   .prompt-details summary { flex-direction: column; }
   .experiment-list li { grid-template-columns: 45px 1fr; }
@@ -137,4 +226,6 @@
   .prompt-details pre { padding: 1rem; font-size: .68rem; }
   .experiment-list li { grid-template-columns: 1fr; gap: .7rem; }
   .experiment-verdict { grid-column: 1; }
+  .shots-grid { grid-template-columns: 1fr; }
+  .condition-title strong { font-size: 2.2rem; }
 }
