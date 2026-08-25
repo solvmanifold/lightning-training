@@ -54,5 +54,14 @@ The compact-prompt condition runs against development data only:
 python3 scripts/evaluate_atlas.py --run-id compact-development-01
 ```
 
+The next prompt-ladder condition uses the explicit routing manual without
+few-shot examples:
+
+```bash
+python3 scripts/evaluate_atlas.py \
+  --prompt-profile manual \
+  --run-id manual-development-01
+```
+
 The same release script discovers both HellaSwag and Atlas evaluators. Keep the
 locked Atlas test split untouched until the prompt conditions are frozen.

@@ -20,7 +20,7 @@ import urllib.request
 
 DEFAULT_ENDPOINT = "http://localhost:8011/v1/chat/completions"
 DEFAULT_MODEL = "nvidia/nemotron-3.5-lightning"
-SYSTEM_PROMPT = (
+COMPACT_PROMPT = (
     "You are the Atlas workflow router. Use the supplied tools only when the request requires "
     "an action. Use exact identifiers from State and never invent arguments. If the request is "
     "ambiguous or lacks a required identifier, do not call a tool; respond exactly CLARIFY: "
@@ -29,6 +29,24 @@ SYSTEM_PROMPT = (
     "multiple actions are requested, emit all required tool calls in request order. Do not "
     "describe tool calls in text."
 )
+MANUAL_PROMPT = """You are the Atlas workflow router. Convert each request into the exact Atlas tool calls required by the supplied State.
+
+Decision rules, in priority order:
+1. If a required entity or identifier is missing or ambiguous, call no tool and respond exactly `CLARIFY: field_name`. In particular, when more than one member matches a name, respond exactly `CLARIFY: user_id`; never choose one arbitrarily.
+2. Respond exactly `NO_ACTION` only when State explicitly shows the requested target state already holds, or when the request asks only for information or prose. Do not use `NO_ACTION` merely because wording is unfamiliar.
+3. Otherwise call the tools. Emit no explanatory text with tool calls. For a multi-action request, emit every required call in request order.
+
+Stable routing manual:
+- Prevent, block, freeze, suspend, quarantine, or lock out an active account: `suspend_account`. Security alerts, incidents, exposure, quarantine, and containment map to `reason_code=security_incident`.
+- Delete, permanently remove, or honor an account deletion request: `delete_account`. An owner or user deletion request maps to `reason_code=user_request`.
+- Replace, roll, or rotate a credential and create a replacement: `rotate_credential`. Exposure or leakage maps to `reason_code=suspected_exposure`.
+- Revoke, disable, kill, retire, or invalidate a credential without replacement: `revoke_credential`. Obsolete or unused maps to `reason_code=no_longer_needed`; exposure or containment maps to `reason_code=suspected_exposure`.
+- Set, give, promote, or change a project member's viewer/editor/admin access: `change_project_role`, even if the current State calls the member a viewer. Use the member's exact `id`, not a display name.
+- Hand over, transfer, or change project ownership: `transfer_project_ownership`.
+- A containment or quarantine request naming both an account and credential requires `suspend_account` followed by `revoke_credential`.
+
+Use only exact identifiers from State. Never invent an argument, silently select among ambiguous entities, omit a requested action, or substitute a nearby tool."""
+PROMPTS = {"compact": COMPACT_PROMPT, "manual": MANUAL_PROMPT}
 STOP_REQUESTED = False
 
 
@@ -182,6 +200,7 @@ def main() -> int:
     parser.add_argument("--timeout", type=float, default=120)
     parser.add_argument("--max-retries", type=int, default=2)
     parser.add_argument("--seed", type=int, default=35_003_500)
+    parser.add_argument("--prompt-profile", choices=sorted(PROMPTS), default="compact")
     parser.add_argument("--validate-only", action="store_true")
     args = parser.parse_args()
 
@@ -189,6 +208,7 @@ def main() -> int:
     catalog_path = args.tool_catalog.resolve()
     cases = load_jsonl(dataset)
     catalog = json.loads(catalog_path.read_text())
+    system_prompt = PROMPTS[args.prompt_profile]
     if any(case["tool_catalog"] != catalog["id"] for case in cases):
         raise RuntimeError("case tool-catalog ID does not match loaded catalog")
     if args.validate_only:
@@ -216,7 +236,8 @@ def main() -> int:
             {
                 "config": config,
                 "dataset_sha256": sha256(dataset),
-                "system_prompt": SYSTEM_PROMPT,
+                "prompt_profile": args.prompt_profile,
+                "system_prompt": system_prompt,
                 "tool_catalog_sha256": sha256(catalog_path),
             },
             sort_keys=True,
@@ -240,7 +261,8 @@ def main() -> int:
             "models_response": get_json(models_url),
             "run_id": args.run_id,
             "run_signature": signature,
-            "system_prompt": SYSTEM_PROMPT,
+            "prompt_profile": args.prompt_profile,
+            "system_prompt": system_prompt,
             "tool_catalog_sha256": sha256(catalog_path),
         }
         write_json(metadata_path, metadata)
@@ -261,7 +283,7 @@ def main() -> int:
                 continue
             payload = {
                 **config,
-                "messages": [{"role": "system", "content": SYSTEM_PROMPT}, *case["messages"]],
+                "messages": [{"role": "system", "content": system_prompt}, *case["messages"]],
                 "tools": catalog["tools"],
             }
             response = None
