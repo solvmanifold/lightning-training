@@ -18,6 +18,7 @@ ALLOWED_URLS = {
     "https://github.com/NVIDIA-NeMo/Automodel",
     "https://github.com/NVIDIA-NeMo/Automodel/blob/060cc495ac23350d4882f67ddf96ba663dd3696c/examples/llm_finetune/nemotron/nemotron_nano_v3_5_lightning_singlegpu_lora.yaml",
     "https://github.com/solvmanifold/lightning-training/blob/main/reports/BEACON_JSON_2026-08-25.md",
+    "https://github.com/solvmanifold/lightning-training/blob/main/scripts/evaluate_beacon_json.py",
 }
 FORBIDDEN = [
     re.compile(pattern, re.IGNORECASE)
@@ -69,6 +70,7 @@ def main() -> None:
         fail("export must not contain symlinks")
 
     manifest = json.loads((DIST / "manifest.json").read_text())
+    data = json.loads((DIST / "brief.json").read_text())
     if manifest.get("schema_version") != 1 or manifest.get("project") != "lightning-training":
         fail("manifest identity is invalid")
     relative_path(manifest["entrypoint"], "entrypoint")
@@ -110,6 +112,14 @@ def main() -> None:
         fail("inline scripts are not allowed")
     if "#main" not in checker.hrefs or "main" not in checker.ids:
         fail("keyboard skip link is missing")
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from evaluate_beacon_json import FINAL_FEWSHOT_CASE_IDS, FINAL_PROMPT  # noqa: PLC0415
+    if data.get("winning_prompt", {}).get("system_prompt") != FINAL_PROMPT:
+        fail("exported system prompt does not match the evaluator")
+    if data.get("winning_prompt", {}).get("fewshot_case_ids") != list(FINAL_FEWSHOT_CASE_IDS):
+        fail("exported few-shot IDs do not match the evaluator")
+    if FINAL_PROMPT not in html:
+        fail("exact frozen system prompt is missing from the HTML")
     print("brief export validation ok")
 
 

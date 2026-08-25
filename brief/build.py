@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -24,6 +25,16 @@ TECHNOLOGIES = {
     "application": ["Python", "Docker", "NeMo AutoModel", "NVIDIA NIM"],
     "ai": [{"name": "NVIDIA Nemotron 3.5 Lightning", "role": "LLM"}],
 }
+
+
+def beacon_context() -> tuple[str, tuple[str, ...], dict[str, object]]:
+    """Load the frozen prompt and example from the evaluator's source of truth."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from evaluate_beacon_json import FINAL_FEWSHOT_CASE_IDS, FINAL_PROMPT  # noqa: PLC0415
+
+    with (ROOT / "data/synthetic/beacon_json/train.jsonl").open() as handle:
+        example = json.loads(next(handle))
+    return FINAL_PROMPT, FINAL_FEWSHOT_CASE_IDS, example
 
 
 def revision() -> str:
@@ -80,10 +91,12 @@ def main() -> None:
     (DIST / "assets").mkdir(parents=True)
     shutil.copy2(SRC / "index.html", DIST / "index.html")
     shutil.copy2(SRC / "brief.css", DIST / "assets" / "brief.css")
+    shutil.copy2(SRC / "example.css", DIST / "assets" / "example.css")
     shutil.copy2(SRC / "brief.js", DIST / "assets" / "brief.js")
 
     source_revision = revision()
     timestamp = built_at()
+    final_prompt, fewshot_ids, example = beacon_context()
     data = {
         "project": {
             "name": "Nemotron Adaptation Lab",
@@ -116,6 +129,26 @@ def main() -> None:
             "locked_test_cases": 512,
             "split_policy": "disjoint surface-language families",
         },
+        "concrete_example": {
+            "case_id": example["id"],
+            "split": "train",
+            "input": example["messages"][0]["content"],
+            "output": example["expected"],
+        },
+        "winning_prompt": {
+            "profile": "final",
+            "system_prompt": final_prompt,
+            "fewshot_case_ids": list(fewshot_ids),
+            "mean_total_input_tokens": 1216,
+            "response_format": "unconstrained JSON text with independent validation",
+        },
+        "experiment_sequence": [
+            {"name": "HellaSwag chat-MC", "purpose": "inference evaluation smoke", "cases": 10042, "result": "84.58% strict accuracy"},
+            {"name": "Atlas routing", "purpose": "tool-use smoke", "result": "37/40 frozen test; no LoRA justified"},
+            {"name": "Beacon prompt ladder", "purpose": "decision baseline", "result": "486/512 locked-test exact"},
+            {"name": "NVIDIA HellaSwag recipe", "purpose": "20-step training infrastructure smoke", "result": "training and checkpoint path proven"},
+            {"name": "Beacon LoRA", "purpose": "controlled behavioral compression", "result": "375/512; adapter rejected"},
+        ],
         "prompt_ladder": [
             {"condition": "Compact", "exact_percent": 29.69, "mean_tokens": 253},
             {"condition": "Manual", "exact_percent": 75.00, "mean_tokens": 515},

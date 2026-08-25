@@ -6,13 +6,14 @@
   <meta name="description" content="An evidence-led brief for the Nemotron 3.5 Lightning evaluation and LoRA decision on DGX Spark.">
   <title>Nemotron Adaptation Lab — Evaluation Brief</title>
   <link rel="stylesheet" href="assets/brief.css">
+  <link rel="stylesheet" href="assets/example.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to evidence</a>
   <header class="masthead">
     <a class="wordmark" href="#top" aria-label="Nemotron Adaptation Lab home"><span>NA</span> Nemotron Adaptation Lab</a>
     <nav aria-label="Brief sections">
-      <a href="#decision">Decision</a><a href="#evidence">Evidence</a><a href="#method">Method</a><a href="#next">Next</a>
+      <a href="#decision">Decision</a><a href="#example">Example</a><a href="#evidence">Evidence</a><a href="#method">Method</a><a href="#next">Next</a>
     </nav>
   </header>
 
@@ -38,6 +39,75 @@
     <section class="decision-strip" id="decision" aria-labelledby="decision-title">
       <div><span class="signal" aria-hidden="true"></span><p class="eyebrow">Deployment decision</p><h2 id="decision-title">Do not deploy the adapter.</h2></div>
       <p>The LoRA removed <strong>79.3%</strong> of prompt tokens, but missed the precommitted quality gate, produced 26 schema-invalid outputs, and was slower through the reliable eager-mode serving path.</p>
+    </section>
+
+    <section class="section example" id="example">
+      <div class="section-head"><div><p class="eyebrow">Concrete task</p><h2>Language in.<br>Canonical job out.</h2></div><p>Beacon is a deterministic compiler task. A request can contain aliases, defaults, corrections, and operational qualifiers; the model must resolve all of them into exactly ten fields.</p></div>
+      <div class="io-grid">
+        <article class="terminal input-terminal"><div class="terminal-head"><span>Input · training example 00000</span><span>User</span></div><p>Copy <mark>res_tr_00000</mark> over to <mark>us-north</mark>. Preview it only; do not apply changes. Correction: use <mark>14 retention days</mark>, not 19. Actually, final urgency is <mark>low</mark>, not high. Treat the resource as regulated and use <mark>strict encryption</mark>. This can wait. Compress the stored data.</p></article>
+        <article class="terminal output-terminal"><div class="terminal-head"><span>Expected output</span><span>Assistant</span></div><pre><code>{
+  "action": "replicate",
+  "compression": true,
+  "encryption": "strict",
+  "execution": "plan",
+  "notify": [],
+  "resource_id": "res_tr_00000",
+  "retention_days": 14,
+  "schema_version": "beacon-job-v1",
+  "target_region": "us-north",
+  "urgency": "low"
+}</code></pre></article>
+      </div>
+      <div class="prompt-intro"><div><p class="eyebrow">Winning condition</p><h3>A manual, explicit system prompt—plus four fixed training examples.</h3></div><p>The prompt names the output contract, maps language to actions, states every default, and handles the errors seen during development: plans versus applied snapshots, urgency boundaries, encryption independence, and final corrections. No JSON grammar was used in the selected condition.</p></div>
+      <details class="prompt-details">
+        <summary><span>Read the exact frozen system prompt</span><small>Final condition · 1,216 mean input tokens including four examples</small></summary>
+        <pre><code>You are the Beacon canonical-job compiler. Return exactly one JSON object with no Markdown, explanation, or extra keys.
+
+Required fields and allowed values:
+- schema_version: always `beacon-job-v1`
+- action: `replicate`, `snapshot`, `restore`, or `retire`
+- resource_id: copy the exact res_* identifier
+- target_region: `us-north`, `us-south`, `eu-central`, `ap-east`, or null
+- urgency: `low`, `normal`, `high`, or `critical`
+- execution: `plan` or `apply`
+- encryption: `standard` or `strict`
+- retention_days: integer from 1 through 365
+- compression: boolean
+- notify: sorted unique array of exact email addresses
+
+Interpretation manual:
+- Mirror, copy, fan out, or create a regional replica means replicate. Replicate requires the named target region.
+- Checkpoint, back up, capture a point-in-time copy, or preserve current state means snapshot. Snapshot target_region is null.
+- Recover, restore, roll back, or reconstitute means restore. Restore requires the named target region.
+- Decommission, retire, take out of rotation, or sunset means retire. Retire target_region is null.
+- No rush or whenever capacity permits means low. Ordinary scheduling means normal. Today or close of business means high. An incident, emergency, impaired production, immediately, or without delay means critical. Default is normal.
+- Preview, simulate, or dry run means execution=plan. Otherwise execution=apply.
+- Sensitive or regulated data requires encryption=strict. Otherwise use standard.
+- Convert weeks to seven days. Defaults are replicate=14, snapshot=30, restore=7, and retire=90 days.
+- Explicit compression or no-compression language overrides defaults. Defaults are true for replicate/snapshot and false for restore/retire.
+- Copy notification addresses exactly, remove duplicates, and sort ascending. Default is an empty array.
+- Apply all explicit clauses regardless of sentence order. If the request corrects itself, the final corrected value wins.
+
+Disambiguation rules:
+- A snapshot/checkpoint is a real applied action, not automatically a plan. Set execution=plan only when the request explicitly says preview, simulate, dry run, or no side effects; otherwise execution=apply for every action.
+- Never infer urgency from an action being destructive, permanent, a restore, or a snapshot. `Today`, `before today ends`, and `close of business` are high. Only explicit incident, emergency, impaired-production, immediately, right-now, or without-delay language is critical.
+
+- When the request has no urgency phrase, urgency is normal—never low. Low requires explicit no-rush, can-wait, or whenever-capacity-permits language.
+- Urgency and action language never imply encryption. Incident, emergency, restore, retirement, permanence, and critical urgency still use encryption=standard unless the request explicitly says sensitive, regulated, strict encryption, or lock encryption down.</code></pre>
+      </details>
+      <p class="source-note">The four few-shot demonstrations were fixed cases 00000, 00001, 00004, and 00007 from the training split. <a href="https://github.com/solvmanifold/lightning-training/blob/main/scripts/evaluate_beacon_json.py">Inspect the evaluator source ↗</a></p>
+    </section>
+
+    <section class="section journey" aria-labelledby="journey-title">
+      <div class="section-head"><div><p class="eyebrow">Experiment map</p><h2 id="journey-title">What we ran—and why.</h2></div><p>Two uses of HellaSwag can sound like one experiment. They were separate: one evaluated the deployed model; the other exercised NVIDIA’s training recipe for 20 steps.</p></div>
+      <ol class="experiment-list">
+        <li><div class="experiment-number">01</div><div><p class="eyebrow">Inference evaluation smoke</p><h3>HellaSwag chat-MC</h3><p>Ran the full 10,042-case validation split through the deployed NVFP4 NIM. Result: <strong>84.58%</strong>, 100% valid labels, zero request errors.</p></div><div class="experiment-verdict neutral"><b>Proved</b><span>evaluation transport, resume, deterministic scoring</span></div></li>
+        <li><div class="experiment-number">02</div><div><p class="eyebrow">Tool-use smoke</p><h3>Atlas routing</h3><p>Prompting reached 40/40 development and 37/40 on the frozen test. The three misses were formatting, and a generic retry detected them.</p></div><div class="experiment-verdict pass"><b>No tune</b><span>prompt + validator closed the measured gap</span></div></li>
+        <li><div class="experiment-number">03</div><div><p class="eyebrow">Decision workload</p><h3>Beacon prompt ladder</h3><p>Built a cleaner deterministic canonical-JSON task. The final prompt scored 486/512 on its locked test.</p></div><div class="experiment-verdict pass"><b>Baseline</b><span>94.92% exact; the target to beat</span></div></li>
+        <li><div class="experiment-number">04</div><div><p class="eyebrow">Training infrastructure smoke</p><h3>NVIDIA HellaSwag recipe</h3><p>Ran NVIDIA NeMo AutoModel’s unmodified single-GPU LoRA recipe for 20 steps on HellaSwag. This tested training, checkpointing, and memory—not model quality.</p></div><div class="experiment-verdict neutral"><b>Proved</b><span>the Spark training path works</span></div></li>
+        <li><div class="experiment-number">05</div><div><p class="eyebrow">Controlled adaptation</p><h3>Beacon LoRA</h3><p>Overfit 16 cases, verified adapter reload in NIM, trained two full-data seeds, selected on development, then opened the test once.</p></div><div class="experiment-verdict fail"><b>Rejected</b><span>73.24% exact versus 94.92% base</span></div></li>
+      </ol>
+      <p class="source-note"><strong>Important:</strong> `hellaswag-chat-mc` is generation-based and is not directly comparable to the standard continuation-likelihood HellaSwag benchmark.</p>
     </section>
 
     <section class="section" id="evidence">

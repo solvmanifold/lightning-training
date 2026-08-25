@@ -1,0 +1,140 @@
+.example {
+  background: #0d1214;
+}
+
+.io-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-bottom: 5rem;
+}
+
+.terminal {
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: #151b1e;
+}
+
+.terminal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .7rem 1rem;
+  border-bottom: 1px solid var(--line);
+  color: #8d9593;
+  font: 600 .65rem var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.terminal p {
+  margin: 0;
+  padding: clamp(1.3rem, 3vw, 2.5rem);
+  font: 400 clamp(1.1rem, 2vw, 1.45rem)/1.65 var(--serif);
+}
+
+.terminal mark {
+  background: transparent;
+  color: var(--acid);
+  font-weight: 700;
+}
+
+.terminal pre,
+.prompt-details pre {
+  margin: 0;
+  padding: clamp(1.3rem, 3vw, 2.5rem);
+  overflow: auto;
+  color: #d8ddda;
+  font: 400 .78rem/1.65 var(--mono);
+  white-space: pre;
+}
+
+.output-terminal { border-top: 5px solid var(--acid); }
+.input-terminal { border-top: 5px solid var(--cyan); }
+
+.prompt-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: end;
+  margin-bottom: 1.5rem;
+}
+
+.prompt-intro h3 { margin-bottom: 0; }
+.prompt-intro > p { color: #b7bcb9; }
+
+.prompt-details {
+  border: 1px solid var(--line);
+  background: #171d20;
+}
+
+.prompt-details summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.2rem 1.4rem;
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.prompt-details summary::marker { color: var(--acid); }
+.prompt-details summary small { color: #8e9694; font-weight: 400; }
+.prompt-details[open] summary { border-bottom: 1px solid var(--line); }
+.source-note { margin: 1rem 0 0; color: #68716e; font-size: .76rem; }
+.source-note a { text-underline-offset: .25em; }
+
+.journey {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.journey .eyebrow { color: #536165; }
+.journey .section-head > p { color: #4d5658; }
+
+.experiment-list {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #bbc0ba;
+  list-style: none;
+}
+
+.experiment-list li {
+  display: grid;
+  grid-template-columns: 65px minmax(0, 1fr) 220px;
+  gap: 2rem;
+  align-items: center;
+  padding: 2rem 0;
+  border-bottom: 1px solid #bbc0ba;
+}
+
+.experiment-number { color: #929a96; font: 400 2rem var(--serif); }
+.experiment-list h3 { margin: .15rem 0 .6rem; }
+.experiment-list p { max-width: 760px; margin: 0; }
+
+.experiment-verdict {
+  padding: .75rem 1rem;
+  border-left: 5px solid #687377;
+}
+
+.experiment-verdict b,
+.experiment-verdict span { display: block; }
+.experiment-verdict b { font: 700 .72rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.experiment-verdict span { margin-top: .25rem; color: #596164; font-size: .72rem; }
+.experiment-verdict.pass { border-color: #739900; }
+.experiment-verdict.fail { border-color: var(--ember); }
+
+@media (max-width: 800px) {
+  .io-grid,
+  .prompt-intro { grid-template-columns: 1fr; }
+  .prompt-intro { gap: 1rem; }
+  .prompt-details summary { flex-direction: column; }
+  .experiment-list li { grid-template-columns: 45px 1fr; }
+  .experiment-verdict { grid-column: 2; }
+}
+
+@media (max-width: 420px) {
+  .terminal pre,
+  .prompt-details pre { padding: 1rem; font-size: .68rem; }
+  .experiment-list li { grid-template-columns: 1fr; gap: .7rem; }
+  .experiment-verdict { grid-column: 1; }
+}
