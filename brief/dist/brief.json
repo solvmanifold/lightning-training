@@ -1,0 +1,84 @@
+{
+  "project": {
+    "name": "Lightning Training",
+    "model": "NVIDIA Nemotron 3.5 Lightning",
+    "posture": "evaluation first",
+    "status": "base model with full prompt selected"
+  },
+  "result": {
+    "verdict": "do_not_deploy_lora",
+    "base_exact": 486,
+    "base_exact_percent": 94.921875,
+    "lora_exact": 375,
+    "lora_exact_percent": 73.2421875,
+    "paired_difference_percentage_points": -21.6796875,
+    "paired_bootstrap_95_percentage_points": [
+      -25.390625,
+      -17.96875
+    ],
+    "prompt_token_reduction_percent": 79.29112458388948,
+    "base_mean_latency_seconds": 1.1366924148101134,
+    "lora_mean_latency_seconds": 2.8099782074048107
+  },
+  "paired": {
+    "both_correct": 372,
+    "base_only_correct": 114,
+    "lora_only_correct": 3,
+    "both_wrong": 23
+  },
+  "dataset": {
+    "generator": "deterministic and LLM-free",
+    "train_cases": 2048,
+    "development_cases": 256,
+    "locked_test_cases": 512,
+    "split_policy": "disjoint surface-language families"
+  },
+  "prompt_ladder": [
+    {
+      "condition": "Compact",
+      "exact_percent": 29.69,
+      "mean_tokens": 253
+    },
+    {
+      "condition": "Manual",
+      "exact_percent": 75.0,
+      "mean_tokens": 515
+    },
+    {
+      "condition": "Manual + fixed examples",
+      "exact_percent": 82.81,
+      "mean_tokens": 789
+    },
+    {
+      "condition": "Optimized",
+      "exact_percent": 89.06,
+      "mean_tokens": 1025
+    },
+    {
+      "condition": "Final",
+      "exact_percent": 96.88,
+      "mean_tokens": 1216
+    }
+  ],
+  "failure_taxonomy": {
+    "compression": 104,
+    "retention_days": 41,
+    "action": 39,
+    "urgency": 17,
+    "notify": 4,
+    "execution": 2,
+    "target_region": 2,
+    "schema_invalid": 26
+  },
+  "measurement": {
+    "date": "2026-08-25",
+    "built_at": "2026-08-25T22:09:28Z",
+    "source_revision": "09403d31ec3234b92f9a0ed5dfa08797a54ae857",
+    "protocol": "Deterministic Beacon JSON generation; development-only prompt and checkpoint selection; one paired opening of the locked test.",
+    "limitations": [
+      "Prompt-ladder scores use development cases and are not independent test estimates.",
+      "Latency observations are single-request measurements, not a cache-throughput benchmark.",
+      "The opened test must not influence further training or prompt edits."
+    ]
+  }
+}
