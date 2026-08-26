@@ -1,4 +1,4 @@
-"""Build the self-contained Nemotron Adaptation Lab static brief."""
+"""Build the self-contained Nemotron 3.5 Lightning evaluation brief."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ BRIEF = ROOT / "brief"
 SRC = BRIEF / "src"
 DIST = BRIEF / "dist"
 CARD_ALT = (
-    "Nemotron Adaptation Lab decision card showing the base model at 94.92 percent "
+    "Nemotron 3.5 Lightning evaluation card showing the base model at 94.92 percent "
     "exact versus LoRA at 73.24 percent, with the verdict keep the prompt."
 )
 TECHNOLOGIES = {
@@ -73,8 +73,8 @@ def make_card(path: Path) -> None:
     draw = ImageDraw.Draw(image)
     draw.ellipse((420, -240, 920, 260), fill="#1a3034")
     draw.rectangle((42, 39, 76, 73), fill="#c8ff35")
-    draw.text((50, 47), "NA", font=font(11, True), fill="#101417")
-    draw.text((91, 47), "NEMOTRON ADAPTATION LAB", font=font(14, True), fill="#f2f0e9")
+    draw.text((50, 47), "NL", font=font(11, True), fill="#101417")
+    draw.text((91, 47), "NEMOTRON 3.5 LIGHTNING EVALUATION", font=font(14, True), fill="#f2f0e9")
     draw.text((42, 123), "THE FINE-TUNE", font=font(48), fill="#f2f0e9")
     draw.text((42, 177), "THAT DIDN'T SHIP.", font=font(48), fill="#c8ff35")
     draw.line((42, 258, 758, 258), fill="#364044", width=2)
@@ -105,7 +105,7 @@ def main() -> None:
     example = examples[0]
     data = {
         "project": {
-            "name": "Nemotron Adaptation Lab",
+            "name": "Nemotron 3.5 Lightning Evaluation",
             "model": "NVIDIA Nemotron 3.5 Lightning",
             "posture": "evaluation first",
             "status": "base model with full prompt selected",

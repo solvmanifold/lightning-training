@@ -1,4 +1,4 @@
-"""Validate the Nemotron Adaptation Lab export against the Spark brief contract."""
+"""Validate the Nemotron 3.5 Lightning export against the Spark brief contract."""
 
 from __future__ import annotations
 
